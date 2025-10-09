@@ -18,7 +18,7 @@ class _LogoScreenState extends State<LogoScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) =>  SplashScreenController()),
+        MaterialPageRoute(builder: (context) => SplashScreenController()),
       );
     });
   }
@@ -26,7 +26,9 @@ class _LogoScreenState extends State<LogoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FlutterLogo(size: 120, style: FlutterLogoStyle.markOnly),
+      body: Center(
+        child: FlutterLogo(size: 120, style: FlutterLogoStyle.markOnly),
+      ),
     );
   }
 }
