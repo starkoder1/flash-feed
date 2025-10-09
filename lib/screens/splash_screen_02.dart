@@ -1,3 +1,4 @@
+import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreenTwo extends StatelessWidget {
@@ -8,17 +9,21 @@ class SplashScreenTwo extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.article, size: 80),
+            Image.asset("assets/logo.png", height: 150),
             SizedBox(height: 15),
             Text("Explore latest news"),
             SizedBox(height: 15),
             Text("rgnrshgenbbfrahbfhd bs hb dhbg hbfefnasufhaiusfhuasd"),
             SizedBox(height: 15),
-            ElevatedButton.icon(
-              onPressed: () {},
-              label: Text("NEXT"),
-              icon: Icon(Icons.navigate_next),
+            CustomElevatedButton(
+              text: "NEXT",
+              txtColor: Colors.white,
+              hPadding: 64,
+              vPadding: 12,
+              onTap: () {},
+              icon: Icon(Icons.arrow_forward, color: Colors.white),
             ),
           ],
         ),
