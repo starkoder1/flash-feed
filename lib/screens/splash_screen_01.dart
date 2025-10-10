@@ -1,32 +1,40 @@
-import 'dart:async';
-
+import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
-import 'splash_screen_02.dart';
 
-class SplashScreenOne extends StatefulWidget {
-  const SplashScreenOne({super.key});
+class SplashScreenOne extends StatelessWidget {
+  SplashScreenOne({super.key, required this.controller});
 
-  @override
-  State<SplashScreenOne> createState() => _SplashScreenOneState();
-}
-
-class _SplashScreenOneState extends State<SplashScreenOne> {
-  @override
-  void initState() {
-    super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SplashScreenTwo()),
-      );
-    });
-  }
-
+  final PageController controller;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FlutterLogo(size: 120, style: FlutterLogoStyle.markOnly),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/logo.png", height: 150),
+            SizedBox(height: 15),
+            Text("Explore latest news"),
+            SizedBox(height: 15),
+            Text("rgnrshgenbbfrahbfhd bs hb dhbg hbfefnasufhaiusfhuasd"),
+            SizedBox(height: 15),
+            CustomElevatedButton(
+              text: "NEXT",
+              txtColor: Colors.white,
+              hPadding: 64,
+              vPadding: 12,
+              onTap: () {
+                if (controller.hasClients) {
+                  controller.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              icon: Icon(Icons.arrow_forward, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
