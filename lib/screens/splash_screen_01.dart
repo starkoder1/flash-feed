@@ -13,10 +13,13 @@ class SplashScreenOne extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/logo.png", height: 150),
+
             SizedBox(height: 15),
             Text("Explore latest news"),
             SizedBox(height: 15),
-            Text("rgnrshgenbbfrahbfhd bs hb dhbg hbfefnasufhaiusfhuasd"),
+            Text(
+              "Stay updated with real-time headlines and trending stories from trusted sources across the globe — all in one place.",
+            ),
             SizedBox(height: 15),
             CustomElevatedButton(
               text: "NEXT",

@@ -1,4 +1,6 @@
 import 'package:flash_feed/screens/splash_screen_01.dart';
+import 'package:flash_feed/screens/splash_screen_02.dart';
+import 'package:flash_feed/screens/splash_screen_03.dart';
 import 'package:flash_feed/widgets/dot_indicator.dart';
 import 'package:flutter/material.dart';
 
@@ -20,14 +22,14 @@ class _SplashScreenControllerState extends State<SplashScreenController> {
             child: PageView(
               controller: _controller,
               children: [
-                SplashScreenOne(controller: _controller,),
-                SplashScreenOne(controller: _controller,),
-                SplashScreenOne(controller: _controller,),
+                SplashScreenOne(controller: _controller),
+                SplashScreenTwo(controller: _controller),
+                SplashScreenThree(controller: _controller),
               ],
             ),
           ),
           SizedBox(height: 30),
-          DotIndicator(controller: _controller, count: 3)
+          DotIndicator(controller: _controller, count: 3),
         ],
       ),
     );
