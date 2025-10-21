@@ -1,3 +1,4 @@
+import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -18,8 +19,8 @@ class DotIndicator extends StatelessWidget {
         controller: controller,
         count: count,
         effect: ExpandingDotsEffect(
-          activeDotColor: Colors.blue,
-          dotColor: Colors.blue.shade200,
+          activeDotColor: primaryShade,
+          dotColor: secondaryShade,
           dotHeight: 8,
           dotWidth: 8,spacing: 8,
           expansionFactor: 4,
