@@ -1,3 +1,5 @@
+import 'package:flash_feed/screens/home_page.dart';
+import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/widgets/category_card.dart';
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
@@ -112,11 +114,16 @@ class CategoryScreen extends StatelessWidget {
             SizedBox(height: 15),
             CustomElevatedButton(
               text: "Get Started",
-              txtColor: Colors.white,
-              hPadding: 64,
-              vPadding: 12,
-              onTap: () {},
-              icon: Icon(Icons.arrow_forward, color: Colors.white),
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                  (route) => false,
+                );
+              },
+              txtColor: secondaryShade,
+              btnHeight: 48,
+              btnWidth: 180,
             ),
           ],
         ),

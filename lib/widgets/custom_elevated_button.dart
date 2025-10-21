@@ -1,3 +1,4 @@
+import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -6,31 +7,38 @@ class CustomElevatedButton extends StatelessWidget {
     required this.text,
     required this.onTap,
     required this.txtColor,
-    this.hPadding = 150,
-    this.vPadding = 10,
+    required this.btnHeight,
+    required this.btnWidth,
     this.icon,
+    this.btnColor = primaryShade,
+    this.iconAlign = IconAlignment.end,
   });
 
   final String text;
   final void Function() onTap;
-  final double hPadding;
-  final double vPadding;
+  final double btnHeight;
+  final double btnWidth;
   final Widget? icon;
   final Color txtColor;
+  final Color btnColor;
+  final IconAlignment iconAlign;
+
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      iconAlignment: IconAlignment.end,
-      onPressed: onTap,
-      label: Text(text, style: TextStyle(color: txtColor)),
-      icon: icon ?? const SizedBox.shrink(),
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(Color(0xFF0864ED)),
-        padding: WidgetStateProperty.all(
-          EdgeInsets.symmetric(horizontal: hPadding, vertical: vPadding),
-        ),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    return SizedBox(
+      height: btnHeight,
+      width: btnWidth,
+      child: ElevatedButton.icon(
+        iconAlignment: iconAlign,
+        onPressed: onTap,
+        label: Text(text, style: TextStyle(color: txtColor)),
+        icon: icon ?? const SizedBox.shrink(),
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(btnColor),
+          elevation: WidgetStatePropertyAll(0),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          ),
         ),
       ),
     );

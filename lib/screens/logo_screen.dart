@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flash_feed/screens/splash_screen_controller.dart';
 import 'package:flutter/material.dart';
-import 'splash_screen_01.dart';
+// import 'splash_screen_01.dart';
 
 class LogoScreen extends StatefulWidget {
   const LogoScreen({super.key});
@@ -27,7 +27,14 @@ class _LogoScreenState extends State<LogoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FlutterLogo(size: 120, style: FlutterLogoStyle.markOnly),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/logo.png", height: 100),
+            SizedBox(height: 15),
+            Text("FlashFeed"),
+          ],
+        ),
       ),
     );
   }

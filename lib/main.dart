@@ -13,7 +13,7 @@ void main() async {
         textTheme: GoogleFonts.lobsterTextTheme(),
         primaryTextTheme: GoogleFonts.lobsterTextTheme(),
       ),
-      home: Scaffold(body: CategoryScreen()),
+      home: Scaffold(body: LogoScreen()),
     ),
   );
 }
