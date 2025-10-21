@@ -1,7 +1,19 @@
+import 'package:flash_feed/screens/category_screen.dart';
 import 'package:flash_feed/screens/logo_screen.dart';
-// import 'package:flash_feed/screens/splash_screen_01.dart';
+import 'package:flash_feed/screens/splash_screen_01.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-void main() {
-  runApp(const MaterialApp(home: Scaffold(body: LogoScreen())));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized;
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        textTheme: GoogleFonts.lobsterTextTheme(),
+        primaryTextTheme: GoogleFonts.lobsterTextTheme(),
+      ),
+      home: Scaffold(body: CategoryScreen()),
+    ),
+  );
 }

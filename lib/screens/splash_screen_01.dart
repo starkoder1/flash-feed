@@ -1,5 +1,6 @@
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreenOne extends StatelessWidget {
   SplashScreenOne({super.key, required this.controller});
