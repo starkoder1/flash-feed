@@ -9,19 +9,23 @@ class SplashScreenTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/categories.png", height: 150),
-              SizedBox(height: 15),
-              Text("Find news with better filters."),
+              Image.asset("assets/categories.png", height: 500),
+              // SizedBox(height: 15),
+              Text(
+                "Find news with better filters.",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+              ),
               SizedBox(height: 15),
               Text(
                 "Customize your feed by selecting categories, topics, and regions that matter most to you for a smarter news experience.",
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.center,style: TextStyle(fontSize: 12),
               ),
               SizedBox(height: 15),
               Row(

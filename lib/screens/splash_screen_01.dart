@@ -1,27 +1,32 @@
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreenOne extends StatelessWidget {
+  // ignore: prefer_const_constructors_in_immutables
   SplashScreenOne({super.key, required this.controller});
 
   final PageController controller;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/search_news.png", height: 150),
-              SizedBox(height: 15),
-              Text("Explore latest news"),
-              SizedBox(height: 15),
+              Image.asset("assets/search_news.png", height: 500),
+              // SizedBox(height: 15),
+              Text(
+                "Explore latest news",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+              ),
+              // SizedBox(height: 15),
               Text(
                 "Stay updated with real-time headlines and trending stories from trusted sources across the globe — all in one place.",
+                style: TextStyle(fontSize: 12),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
