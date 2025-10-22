@@ -6,6 +6,7 @@ class CategoryCard extends StatelessWidget {
   final Color backgroundColor;
   final Color iconColor;
   final VoidCallback? onTap;
+  final bool isSelected;
 
   const CategoryCard({
     super.key,
@@ -14,31 +15,72 @@ class CategoryCard extends StatelessWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.onTap,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Card(
-        color: backgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        elevation: 0.25,
+        color: backgroundColor.withOpacity(isSelected ? 0.85 : 1.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: isSelected
+              ? BorderSide(color: iconColor, width: 2)
+              : BorderSide.none,
+        ),
+        elevation: isSelected ? 3 : 0.25,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(6),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(14.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(icon, color: iconColor, size: 28),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon,
+                      color: isSelected
+                          ? iconColor
+                          : iconColor.withOpacity(0.7),
+                      size: 30,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w600,
+                        fontSize: 13,
+                        color: Colors.black.withOpacity(0.85),
+                      ),
+                    ),
+                  ],
+                ),
+                //  Checkmark in bottom-right corner
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: AnimatedOpacity(
+                    opacity: isSelected ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: iconColor,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                    ),
                   ),
                 ),
               ],
