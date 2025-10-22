@@ -1,4 +1,5 @@
 import 'package:flash_feed/screens/home_page.dart';
+import 'package:flash_feed/screens/home_page_controller.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/widgets/category_card.dart';
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
@@ -117,7 +118,7 @@ class CategoryScreen extends StatelessWidget {
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
+                  MaterialPageRoute(builder: (context) => HomePageController()),
                   (route) => false,
                 );
               },

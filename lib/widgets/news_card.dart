@@ -9,14 +9,20 @@ class NewsCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        elevation: 1.5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(roundedBoxRadius),
+        ),
+        elevation: 1.25,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(roundedBoxRadius),
+                    topRight: Radius.circular(roundedBoxRadius),
+                  ),
                   child: Image.asset(
                     "assets/logo.png",
                     height: 200,
@@ -31,7 +37,7 @@ class NewsCard extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      color: secondaryShade,
+                      color: const Color(0xFFcde5ff),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text("Category"),
@@ -48,7 +54,9 @@ class NewsCard extends StatelessWidget {
                 children: [
                   // Title
                   Text(
-                    "jdnvjsn jgvnbjjdsv gn",
+                    "title here",
+                    textAlign:
+                        TextAlign.start, // Correct placement of textAlign
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -60,7 +68,7 @@ class NewsCard extends StatelessWidget {
 
                   // Short description
                   Text(
-                    "sdjgkbewbfvhdbvdhvbvhdubuoahbadkjvn bhujdbfhuebfwuhbuofdnhujnvfbuefhafedj",
+                    "description of the news here",
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
@@ -68,6 +76,21 @@ class NewsCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20, bottom: 15),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(Icons.share),
+                    SizedBox(width: 15),
+                    Icon(Icons.bookmark_border),
+                  ],
+                ),
               ),
             ),
           ],

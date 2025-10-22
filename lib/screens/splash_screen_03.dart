@@ -1,5 +1,4 @@
 import 'package:flash_feed/screens/category_screen.dart';
-import 'package:flash_feed/screens/home_page.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
@@ -10,22 +9,26 @@ class SplashScreenThree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/share.png", height: 150),
+              Image.asset("assets/share.png", height: 500),
               SizedBox(height: 15),
-              Text("Bookmark, share & comments on news"),
+              Text(
+                "Bookmark, share & comments on news",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+              ),
               SizedBox(height: 15),
               Text(
                 "Save articles to read later or share interesting stories with your friends instantly.",
                 textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12),
               ),
-              SizedBox(height: 15),
-              SizedBox(height: 15),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
