@@ -14,16 +14,20 @@ class DotIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 30),
-      child: SmoothPageIndicator(
-        controller: controller,
-        count: count,
-        effect: ExpandingDotsEffect(
-          activeDotColor: primaryShade,
-          dotColor: secondaryShade,
-          dotHeight: 8,
-          dotWidth: 8,spacing: 8,
-          expansionFactor: 4,
+      padding: EdgeInsets.only(bottom: 25),
+      child: Container(
+        color: Colors.white,
+        child: SmoothPageIndicator(
+          controller: controller,
+          count: count,
+          effect: ExpandingDotsEffect(
+            activeDotColor: primaryShade,
+            dotColor: secondaryShade,
+            dotHeight: 8,
+            dotWidth: 8,
+            spacing: 8,
+            expansionFactor: 4,
+          ),
         ),
       ),
     );

@@ -17,18 +17,18 @@ class SplashScreenThree extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset("assets/share.png", height: 500),
-              SizedBox(height: 15),
+
               Text(
                 "Bookmark, share & comments on news",
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
               ),
               SizedBox(height: 15),
               Text(
-                "Save articles to read later or share interesting stories with your friends instantly.",
+                "Save articles to read later or share interesting stories with your friends instantly",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 12),
               ),
-
+              SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

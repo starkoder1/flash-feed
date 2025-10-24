@@ -1,7 +1,10 @@
 import 'package:flash_feed/screens/home_page.dart';
+import 'package:flash_feed/screens/home_page_controller.dart';
+import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/widgets/category_card.dart';
 import 'package:flash_feed/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -26,8 +29,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("All Category"),
+        backgroundColor: secondaryShade,
+        title: Text(
+          "CATEGORIES",
+          style: GoogleFonts.manrope(
+            color: primaryShade,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -183,7 +195,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 onTap: () {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(
+                      builder: (context) => HomePageController(),
+                    ),
                     (route) => false,
                   );
                 },

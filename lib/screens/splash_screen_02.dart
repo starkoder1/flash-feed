@@ -19,15 +19,16 @@ class SplashScreenTwo extends StatelessWidget {
               Image.asset("assets/categories.png", height: 500),
               // SizedBox(height: 15),
               Text(
-                "Find news with better filters.",
+                "Find news with better filters",
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
               ),
               SizedBox(height: 15),
               Text(
-                "Customize your feed by selecting categories, topics, and regions that matter most to you for a smarter news experience.",
-                textAlign: TextAlign.center,style: TextStyle(fontSize: 12),
+                "Customize your feed by selecting categories, topics, and regions that matter most to you for a smarter news experience",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12),
               ),
-              SizedBox(height: 15),
+              SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
