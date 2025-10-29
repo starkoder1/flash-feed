@@ -37,6 +37,10 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   google_fonts: ^6.3.2
   persistent_bottom_nav_bar_v2: ^6.1.0
+  http: ^1.5.0
+  xml: ^6.6.1
+  webview_flutter: ^4.13.0
+  flutter_animate: ^4.5.2
 
 dev_dependencies:
   flutter_test:

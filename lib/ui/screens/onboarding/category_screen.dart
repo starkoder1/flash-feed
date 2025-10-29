@@ -1,10 +1,11 @@
-import 'package:flash_feed/screens/home_page.dart';
-import 'package:flash_feed/screens/home_page_controller.dart';
+import 'package:flash_feed/ui/screens/home/home_page.dart';
+import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/utils/util.dart';
-import 'package:flash_feed/widgets/category_card.dart';
-import 'package:flash_feed/widgets/custom_elevated_button.dart';
+import 'package:flash_feed/ui/widgets/category_card.dart';
+import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});

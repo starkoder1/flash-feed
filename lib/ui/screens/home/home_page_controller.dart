@@ -1,7 +1,7 @@
-import 'package:flash_feed/screens/home_page.dart';
+import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 // import 'package:flash_feed/screens/feed_page.dart';
-import 'package:flash_feed/screens/settings_page.dart';
+import 'package:flash_feed/ui/screens/home/settings_page.dart';
 import 'package:flash_feed/utils/util.dart';
 // import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
