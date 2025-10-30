@@ -15,7 +15,7 @@ class _LogoScreenState extends State<LogoScreen> {
     super.initState();
 
     // Wait for full animation to finish before navigating
-    Future.delayed(const Duration(seconds: 7), () {
+    Future.delayed(const Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const SplashScreenController()),
@@ -49,7 +49,7 @@ class _LogoScreenState extends State<LogoScreen> {
                           // initially hidden
                           .animate()
                           .fadeIn(
-                            delay: 2
+                            delay: 1
                                 .seconds, // shows after logo shift starts finishing
                             duration: 1.5.seconds,
                             curve: Curves.easeIn,
@@ -57,7 +57,7 @@ class _LogoScreenState extends State<LogoScreen> {
                           .slide(
                             begin: const Offset(-0.9, 0), // from behind logo
                             end: Offset.zero,
-                            duration: 1.2.seconds,
+                            duration: 1.seconds,
                             curve: Curves.easeOut,
                           ),
                 ),
@@ -68,7 +68,7 @@ class _LogoScreenState extends State<LogoScreen> {
                     .slide(
                       begin: Offset.zero,
                       end: const Offset(-0.9, 0), // slide to left
-                      duration: 2.seconds,
+                      duration: 0.8.seconds,
                       curve: Curves.easeIn,
                     )
                     .scale(
@@ -87,7 +87,7 @@ class _LogoScreenState extends State<LogoScreen> {
                 letterSpacing: 1.2,
               ),
             ).animate().fadeIn(
-              delay: 3.5.seconds, // after logo + name finish
+              delay: 2.5.seconds, // after logo + name finish
               duration: 0.5.seconds,
               curve: Curves.easeInBack,
             ),

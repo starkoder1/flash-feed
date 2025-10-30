@@ -1,4 +1,6 @@
 import 'package:flash_feed/data/models/news_item.dart';
+import 'package:flash_feed/data/sources/engadget_source.dart';
+import 'package:flash_feed/data/sources/technology/ars_technica_source.dart';
 import 'package:flash_feed/data/sources/technology/cnet_source.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/utils/util.dart';
@@ -20,7 +22,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _newsFuture = CnetSource().fetchNews();
+    _newsFuture = ArsTechnicaSource.fetchNews();
   }
 
   @override

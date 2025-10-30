@@ -12,7 +12,7 @@ void main() async {
         textTheme: GoogleFonts.manropeTextTheme(),
         primaryTextTheme: GoogleFonts.manropeTextTheme(),
       ),
-      home: Scaffold(body: LogoScreen()),
+      home: Scaffold(body: HomePage()),
     ),
   );
 }
