@@ -1,5 +1,6 @@
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/data/sources/technology/cnet_source.dart';
+import 'package:flash_feed/data/sources/technology/the_verge_source.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _newsFuture = CnetSource().fetchNews();
+    _newsFuture = TheVergeSource().fetchNews();
   }
 
   @override
