@@ -1,5 +1,9 @@
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/data/sources/engadget_source.dart';
+import 'package:flash_feed/data/sources/nasa/nasa_image_source.dart';
+import 'package:flash_feed/data/sources/nasa/nasa_news_source.dart';
+import 'package:flash_feed/data/sources/nasa/nasa_technology_source.dart';
+import 'package:flash_feed/data/sources/science/physics_org_source.dart';
 import 'package:flash_feed/data/sources/technology/ars_technica_source.dart';
 import 'package:flash_feed/data/sources/technology/cnet_source.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
@@ -22,7 +26,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _newsFuture = ArsTechnicaSource.fetchNews();
+    _newsFuture = CnetSource().fetchNews();
   }
 
   @override
