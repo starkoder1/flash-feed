@@ -4,8 +4,6 @@ import 'package:flash_feed/data/sources/nasa/nasa_image_source.dart';
 import 'package:flash_feed/data/sources/nasa/nasa_news_source.dart';
 import 'package:flash_feed/data/sources/nasa/nasa_technology_source.dart';
 import 'package:flash_feed/data/sources/science/physics_org_source.dart';
-import 'package:flash_feed/data/sources/health/medical_express_source.dart';
-import 'package:flash_feed/data/sources/technology/engadget_source.dart';
 import 'package:flash_feed/data/sources/technology/ars_technica_source.dart';
 import 'package:flash_feed/data/sources/technology/cnet_source.dart';
 import 'package:flash_feed/data/sources/technology/nasa_jpl_source.dart';
