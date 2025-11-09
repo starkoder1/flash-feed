@@ -2,11 +2,12 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
-class JplNewsService {
+// A new class name for this separate file
+class PhysicsOrgSource {
   // The specific URL for this service
-  final String _feedUrl = "https://www.jpl.nasa.gov/feeds/news/";
+  final String _feedUrl = "https://phys.org/rss-feed/space-news/astronomy/";
 
-  /// Fetches and parses the JPL RSS feed.
+  /// Fetches and parses the Astronomy RSS feed.
   Future<List<NewsItem>> fetchNews() async {
     try {
       // 1. Fetch the data
@@ -21,7 +22,7 @@ class JplNewsService {
 
       // 3. Find the source name from the channel
       final channel = document.findAllElements('channel').firstOrNull;
-      final sourceName = _findElementText(channel, 'title') ?? 'JPL News';
+      final sourceName = _findElementText(channel, 'title') ?? 'Astronomy News';
 
       // 4. Find all <item> elements and map them
       final newsItems = document.findAllElements('item').map((itemElement) {
@@ -43,22 +44,25 @@ class JplNewsService {
   NewsItem _parseItem(xml.XmlElement item, String sourceName) {
     // Extract standard RSS tags
     final title = _findElementText(item, 'title') ?? 'No Title';
-    final description = _findElementText(item, 'description') ?? 'No Description';
+    final description =
+        _findElementText(item, 'description') ?? 'No Description';
     final link = _findElementText(item, 'link') ?? '';
-    final pubDateStr = _findElementText(item, 'pubDate');
+    final category = _findElementText(item, 'category')?.trim() ?? 'General';
+
+    // Check for different date formats
+    final pubDateStr =
+        _findElementText(item, 'pubDate') ?? _findElementText(item, 'dc:date');
     final publishedAt = DateTime.tryParse(pubDateStr ?? '') ?? DateTime.now();
 
-    // ---
-    // This feed uses <media:content> instead of <media:thumbnail>
-    // ---
-    final mediaContent = item.findElements('media:content').firstOrNull;
-    final imageUrl = mediaContent?.getAttribute('url') ?? '';
+    // Find the <media:thumbnail> image
+    final mediaThumbnail = item.findElements('media:thumbnail').firstOrNull;
+    final imageUrl = mediaThumbnail?.getAttribute('url') ?? '';
 
-    // This feed does not seem to provide an author per item
-    final author = _findElementText(item, 'author') ?? _findElementText(item, 'dc:creator') ?? '';
-
-    // Use the channel's title as the source
-    final source = sourceName;
+    // Check for different author formats
+    final author =
+        _findElementText(item, 'author') ??
+        _findElementText(item, 'dc:creator') ??
+        '';
 
     return NewsItem(
       title: title,
@@ -67,8 +71,8 @@ class JplNewsService {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: 'NASA JPL',
-      category: 'SPACE',
+      source: "Phys.org",
+      category: category,
     );
   }
 

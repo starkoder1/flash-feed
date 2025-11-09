@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/utils/util.dart';
@@ -26,12 +27,19 @@ class NewsCard extends StatelessWidget {
                     topLeft: Radius.circular(roundedBoxRadius),
                     topRight: Radius.circular(roundedBoxRadius),
                   ),
-                  child: Image.network(
-                    newsItem.imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: newsItem.imageUrl,
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Image.asset(
+                    filterQuality: FilterQuality.low, // keeps scroll smooth
+                    placeholder: (_, __) => const SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (_, __, ___) => Image.asset(
                       "assets/logo.png",
                       height: 200,
                       width: double.infinity,

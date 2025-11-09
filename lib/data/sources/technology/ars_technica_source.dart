@@ -7,7 +7,7 @@ import 'package:xml/xml.dart';
 class ArsTechnicaSource {
   static const String _feedUrl = 'https://arstechnica.com/feed/';
 
-  static Future<List<NewsItem>> fetchNews() async {
+   Future<List<NewsItem>> fetchNews() async {
     try {
       final response = await http.get(Uri.parse(_feedUrl));
 
