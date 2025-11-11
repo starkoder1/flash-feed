@@ -1,4 +1,8 @@
+import 'package:flash_feed/data/categories/providers/finance_provider.dart';
+import 'package:flash_feed/data/categories/providers/gaming_provider.dart';
+import 'package:flash_feed/data/categories/providers/sports_provider.dart';
 import 'package:flash_feed/data/categories/providers/tech_provider.dart';
+import 'package:flash_feed/data/categories/providers/world_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/utils/util.dart';
