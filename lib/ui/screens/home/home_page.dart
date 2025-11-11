@@ -1,3 +1,6 @@
+import 'package:flash_feed/data/categories/providers/health_provider.dart';
+import 'package:flash_feed/data/categories/providers/movie_provider.dart';
+import 'package:flash_feed/data/categories/providers/nasa_provider.dart';
 import 'package:flash_feed/data/categories/providers/tech_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';

@@ -6,7 +6,7 @@ class NasaNewsSource {
   final String feedUrl = "https://www.nasa.gov/news-release/feed/";
 
   /// Fetches and parses the NASA RSS feed
-  Future<List<NewsItem>> fetchNewsFeed() async {
+  Future<List<NewsItem>> fetchNews() async {
     try {
       final response = await http.get(Uri.parse(feedUrl));
 
