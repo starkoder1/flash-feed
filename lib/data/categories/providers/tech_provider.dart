@@ -19,10 +19,10 @@ final techListProvider = FutureProvider<List<NewsItem>>((ref) async {
   final allTechList = await Future.wait([
     CnetSource().fetchNews().catchError(
       (error, stackTrace) => onError('CNET Failed', error),
-    ), //25
+    ),
     ArsTechnicaSource().fetchNews().catchError(
       (error, stackTrace) => onError('ArsTechnica Failed', error),
-    ), //23
+    ),
     EngadgetSource().fetchNews().catchError(
       (error, stackTrace) => onError('Engadget Failed', error),
     ),

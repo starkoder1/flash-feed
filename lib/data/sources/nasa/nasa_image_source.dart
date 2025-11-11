@@ -2,10 +2,10 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
-class FeedService {
+class NasaImageSource {
   final String feedUrl = "https://www.nasa.gov/feeds/iotd-feed/";
 
-  Future<List<NewsItem>> fetchFeed() async {
+  Future<List<NewsItem>> fetchNews() async {
     try {
       final response = await http.get(Uri.parse(feedUrl));
 
