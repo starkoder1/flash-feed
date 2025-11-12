@@ -46,6 +46,7 @@ class _MainScreenState extends State<HomePageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueGrey,
       body: PageView(
         // Replace the simple body with PageView for animated transitions
         controller: _pageController,

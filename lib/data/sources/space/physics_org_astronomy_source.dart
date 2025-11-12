@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
 // A new class name for this separate file
-class PhysicsOrgSource {
+class PhysicsOrgAstronomySource {
   // The specific URL for this service
   final String _feedUrl = "https://phys.org/rss-feed/space-news/astronomy/";
 
