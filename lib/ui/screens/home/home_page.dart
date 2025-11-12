@@ -38,7 +38,7 @@ class HomePage extends ConsumerWidget {
           ],
         ),
         elevation: 0,
-        backgroundColor: primaryShade,
+        // backgroundColor: Color(0xFF101C4D),
       ),
       // 2. Use .when to handle loading/error/data states gracefully.
       body: newsAsyncValue.when(
