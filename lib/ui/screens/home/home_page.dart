@@ -88,7 +88,6 @@ class HomePage extends ConsumerWidget {
             ],
           ),
           elevation: 0,
-          backgroundColor: primaryShade,
         ),
         body: TabBarView(
           children: categoryMap.values.map((provider) {

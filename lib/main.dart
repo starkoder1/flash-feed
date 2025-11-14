@@ -40,16 +40,16 @@ class MyApp extends ConsumerWidget {
 
       // 🌚 Dark Theme
       darkTheme: ThemeData(
-        appBarTheme: AppBarTheme(color: Color(0xFF101C4D)),
+        appBarTheme: AppBarTheme(color: darkmodeShade),
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.grey[900],
+        // scaffoldBackgroundColor: darkmodeShade,
         textTheme: GoogleFonts.manropeTextTheme().apply(
           bodyColor: Colors.white,
           displayColor: Colors.white,
         ),
       ),
 
-      home: HomePage(), //  You can navigate to SettingsPage from here
+      home: LogoScreen(), //  You can navigate to SettingsPage from here
     );
   }
 }
