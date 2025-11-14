@@ -10,22 +10,32 @@ import 'package:flash_feed/data/categories/providers/space_provider.dart';
 import 'package:flash_feed/data/categories/providers/sports_provider.dart';
 import 'package:flash_feed/data/categories/providers/tech_provider.dart';
 import 'package:flash_feed/data/categories/providers/world_provider.dart';
+import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/ui/widgets/skeleton_loading_card.dart';
-import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/ui/widgets/news_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:skeletonizer/skeletonizer.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final categoryMap = {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final PageController _pageController = PageController();
+  late final Map<String, FutureProvider<List<NewsItem>>> categoryMap;
+  int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    categoryMap = {
       'Technology': techListProvider,
       'World': worldListProvider,
       'Environment': environmentListProvider,
@@ -39,62 +49,90 @@ class HomePage extends ConsumerWidget {
       'Movie': movieListProvider,
       'NASA': nasaListProvider,
     };
+  }
 
-    return DefaultTabController(
-      length: categoryMap.length,
-      child: Scaffold(
-        backgroundColor: Colors.grey[300],
-        appBar: AppBar(
-          bottom: TabBar(
-            dividerColor: Colors.grey,
-            dividerHeight: 4,
-            // indicatorWeight: 16,
-            // indicator: UnderlineTabIndicator(),
-            indicatorColor: Colors.white,
-            indicatorAnimation: TabIndicatorAnimation.linear,
-            // padding: EdgeInsets.zero, // 🔥 removes default left/right padding
-            labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-            tabAlignment: TabAlignment.start,
-            labelColor: Colors.white,
-            labelStyle: TextStyle(
-              fontSize: 16,
-              // fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-            ),
-            unselectedLabelColor: secondaryShade,
+  void _onChipSelected(int index) {
+    setState(() => _selectedIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
-            isScrollable: true,
-            tabs: categoryMap.keys.map((String title) {
-              return Tab(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(title),
-                ),
-              );
-            }).toList(),
-          ),
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset("assets/logo_alt.png", height: 40, width: 40),
-              Text(
-                "lashFeed",
-                style: GoogleFonts.manrope(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                ),
+  @override
+  Widget build(BuildContext context) {
+    final categories = categoryMap.keys.toList();
+    final isDarkMode = ref.watch(themeProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        // backgroundColor: primaryShade,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset("assets/logo_alt.png", height: 40, width: 40),
+            Text(
+              "lashFeed",
+              style: GoogleFonts.manrope(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
               ),
-            ],
+            ),
+          ],
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(55),
+          child: Container(
+            color: isDarkMode ? Colors.black : Colors.white,
+            padding: const EdgeInsets.only(bottom: 8, top: 4),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(categories.length, (index) {
+                  final isSelected = _selectedIndex == index;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: ChoiceChip(
+                      elevation: 2,
+                      side: BorderSide.none,
+                      label: Text(
+                        categories[index],
+                        style: GoogleFonts.manrope(
+                          color: isSelected
+                              ? Colors.white
+                              : isDarkMode
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: isSelected
+                              ? FontWeight.w900
+                              : FontWeight.w500,
+                        ),
+                      ),
+                      showCheckmark: false,
+                      selected: isSelected,
+                      
+                      // backgroundColor: Colors.white,
+                      onSelected: (_) => _onChipSelected(index),
+                    ),
+                  );
+                }),
+              ),
+            ),
           ),
-          elevation: 0,
-          backgroundColor: primaryShade,
         ),
-        body: TabBarView(
-          children: categoryMap.values.map((provider) {
-            return NewsCategoryView(provider: provider);
-          }).toList(),
-        ),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        children: categoryMap.values.map((provider) {
+          return NewsCategoryView(provider: provider);
+        }).toList(),
       ),
     );
   }

@@ -29,7 +29,11 @@ class MyApp extends ConsumerWidget {
 
       // 🌞 Light Theme
       theme: ThemeData(
-        appBarTheme: AppBarTheme(color: primaryShade),
+        chipTheme: ChipThemeData(
+          backgroundColor: Colors.white,
+          selectedColor: primaryShade,
+        ),
+        appBarTheme: AppBarTheme(backgroundColor: primaryShade),
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.manropeTextTheme().apply(
@@ -40,7 +44,11 @@ class MyApp extends ConsumerWidget {
 
       // 🌚 Dark Theme
       darkTheme: ThemeData(
-        appBarTheme: AppBarTheme(color: Color(0xFF101C4D)),
+        chipTheme: ChipThemeData(
+          selectedColor: Color(0xFF101C4D),
+          backgroundColor: Colors.black,
+        ), //we change the color in dark mode to blend in with the color of the individual chips container
+        appBarTheme: AppBarTheme(backgroundColor: Color(0xFF101C4D)),
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.grey[900],
         textTheme: GoogleFonts.manropeTextTheme().apply(
