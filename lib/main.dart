@@ -50,14 +50,14 @@ class MyApp extends ConsumerWidget {
         ), //we change the color in dark mode to blend in with the color of the individual chips container
         appBarTheme: AppBarTheme(backgroundColor: Color(0xFF101C4D)),
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.grey[900],
+        // scaffoldBackgroundColor: darkmodeShade,
         textTheme: GoogleFonts.manropeTextTheme().apply(
           bodyColor: Colors.white,
           displayColor: Colors.white,
         ),
       ),
 
-      home: HomePage(), //  You can navigate to SettingsPage from here
+      home: LogoScreen(), //  You can navigate to SettingsPage from here
     );
   }
 }

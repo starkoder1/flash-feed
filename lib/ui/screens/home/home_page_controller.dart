@@ -1,18 +1,20 @@
+import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 // import 'package:flash_feed/screens/feed_page.dart';
 import 'package:flash_feed/ui/screens/home/settings_page.dart';
 import 'package:flash_feed/utils/util.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
-class HomePageController extends StatefulWidget {
+class HomePageController extends ConsumerStatefulWidget {
   const HomePageController({super.key});
 
   @override
-  State<HomePageController> createState() => _MainScreenState();
+  ConsumerState<HomePageController> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<HomePageController> {
+class _MainScreenState extends ConsumerState<HomePageController> {
   int _selectedIndex = 0;
   late PageController
   _pageController; // Add this for controlling page animations
@@ -45,8 +47,10 @@ class _MainScreenState extends State<HomePageController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = ref.watch(themeProvider);
+
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
+      backgroundColor: Color(0xFF101C4D),
       body: PageView(
         // Replace the simple body with PageView for animated transitions
         controller: _pageController,
@@ -63,9 +67,9 @@ class _MainScreenState extends State<HomePageController> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         backgroundColor: secondaryShade,
-        selectedItemColor: primaryShade,
+        selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
         unselectedItemColor: Colors.grey,
-        showUnselectedLabels: false,
+        showUnselectedLabels: true,
         type: BottomNavigationBarType.shifting,
         items: const [
           BottomNavigationBarItem(
