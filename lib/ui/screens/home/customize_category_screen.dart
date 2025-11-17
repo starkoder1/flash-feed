@@ -1,15 +1,12 @@
 import 'dart:math'; // Added for Random
 import 'package:flash_feed/data/features/category_customize_provider.dart';
+import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
-import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
-import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';
-import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
-// Updated data class (removed the 'color' property)
 class _CategoryInfo {
   final IconData icon;
   final String title;
@@ -22,14 +19,39 @@ class _CategoryInfo {
   });
 }
 
-class CategoryScreen extends ConsumerStatefulWidget {
-  const CategoryScreen({super.key});
+class CustomizeCategoryScreen extends ConsumerStatefulWidget {
+  const CustomizeCategoryScreen({super.key});
 
   @override
-  ConsumerState<CategoryScreen> createState() => _CategoryScreenState();
+  ConsumerState<CustomizeCategoryScreen> createState() =>
+      _CategoryScreenState();
 }
 
-class _CategoryScreenState extends ConsumerState<CategoryScreen> {
+//function for showing warning dialogue box
+Future<bool> _showWarningDialogue(BuildContext context) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Row(
+          children: [Icon(Icons.info), SizedBox(width: 5), Text("Alert")],
+        ),
+        content: const Text(
+          'Please select at least 3 category before leaving.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+  return result ?? false;
+}
+
+class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
   // --- 1. Translated Gradients from your React code ---
   final List<LinearGradient> _gradients = [
     // from-blue-500 to-cyan-500
@@ -150,8 +172,6 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   ];
 
   void _toggleCategory(NewsCategory category) {
-    // This now only calls the provider to update the state.
-    // The UI will rebuild automatically because we are 'watching' the provider.
     ref.read(selectedCategoriesProvider.notifier).toggleCategory(category);
   }
 
@@ -159,118 +179,80 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   void initState() {
     super.initState();
     initGradients();
+    // Initialize the local state with the provider's state when the screen loads.
+    // This ensures that previously selected categories are shown as selected.
+    // Note: This is a one-time sync. The UI will then react to provider changes.
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = ref.watch(themeProvider);
     final selectedCategories = ref.watch(selectedCategoriesProvider);
-    final isNextButtonEnabled = selectedCategories.length >= 3;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset("assets/logo_alt.png", height: 40, width: 40),
-            Text(
-              "lashFeed",
-              style: GoogleFonts.manrope(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: primaryShade,
-        elevation: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 16.0,
-            ),
-            child: CustomElevatedButton(
-              text: isNextButtonEnabled ? "NEXT" : "",
-              onTap: () {
-                isNextButtonEnabled
-                    ? Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePageController(),
-                        ),
-                        (route) => false,
-                      )
-                    : null;
-              },
-              txtColor: isNextButtonEnabled ? primaryShade : secondaryShade,
-              btnHeight: 40,
-              btnWidth: 105,
-              btnColor: isNextButtonEnabled ? secondaryShade : primaryShade,
-              icon: Icon(Icons.chevron_right, color: primaryShade),
+    return PopScope(
+      canPop: selectedCategories.length >= 3,
+      onPopInvoked: (didPop) async {
+        if (!didPop && selectedCategories.length < 3) {
+          await _showWarningDialogue(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          title: Text(
+            "Customize Feed",
+            style: GoogleFonts.manrope(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
             ),
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Text(
-                "Pick Your Interests",
-                style: GoogleFonts.manrope(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                "Select at least 3 topics",
-                style: GoogleFonts.manrope(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  physics: const BouncingScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1, // square cards
+          elevation: 0,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+
+                const SizedBox(height: 24),
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    physics: const BouncingScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 1, // square cards
+                        ),
+                    itemCount: _categories.length,
+                    itemBuilder: (context, index) {
+                      final category = _categories[index];
+                      final isSelected = selectedCategories.contains(
+                        category.categoryEnum,
+                      );
+
+                      // --- 4. Get the gradient for the card ---
+                      final gradient = isSelected
+                          ? _getGradientForCategory(category.title)
+                          : null;
+
+                      return _InterestCard(
+                        data: category,
+                        isSelected: isSelected,
+                        onTap: () => _toggleCategory(category.categoryEnum),
+                        // Pass the gradient to the card
+                        selectedGradient: gradient,
+                        isDarkMode: isDarkMode,
+                      );
+                    },
                   ),
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    final isSelected = selectedCategories.contains(
-                      category.categoryEnum,
-                    );
-
-                    // --- 4. Get the gradient for the card ---
-                    final gradient = isSelected
-                        ? _getGradientForCategory(category.title)
-                        : null;
-
-                    return _InterestCard(
-                      data: category,
-                      isSelected: isSelected,
-                      onTap: () => _toggleCategory(category.categoryEnum),
-                      // Pass the gradient to the card
-                      selectedGradient: gradient,
-                    );
-                  },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -290,8 +272,9 @@ class _InterestCard extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.selectedGradient,
+    required this.isDarkMode,
   });
-
+  final bool isDarkMode;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -304,10 +287,10 @@ class _InterestCard extends StatelessWidget {
             height: 160,
             decoration: BoxDecoration(
               gradient: isSelected ? selectedGradient : null,
-              color: isSelected ? null : Colors.white,
+              color: isSelected ? null : Colors.white70,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? Colors.transparent : Colors.grey[200]!,
+                color: isDarkMode ? Colors.transparent : Colors.grey[200]!,
                 width: 1,
               ),
               boxShadow: isSelected
@@ -358,16 +341,33 @@ class _InterestCard extends StatelessWidget {
           ),
 
           // ⭐ FULL CARD SHIMMER EFFECT
+          // ⭐ FIXED SHIMMER (no leak in dark mode)
           if (isSelected)
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Shimmer.fromColors(
-                  direction: ShimmerDirection.ltr,
-                  baseColor: Colors.white.withOpacity(0.1),
-                  highlightColor: Colors.white.withOpacity(0.60),
-                  period: const Duration(milliseconds: 1500),
-                  child: Container(color: Colors.white.withOpacity(0.4)),
+                child: Stack(
+                  children: [
+                    // This prevents glow from touching card edges
+                    Positioned.fill(
+                      top: 10,
+                      bottom: 10,
+                      left: 10,
+                      right: 10,
+                      child: Shimmer.fromColors(
+                        direction: ShimmerDirection.ltr,
+                        baseColor: Colors.white.withOpacity(0.05),
+                        highlightColor: Colors.white.withOpacity(0.60),
+                        period: Duration(milliseconds: 1200),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

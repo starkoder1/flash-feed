@@ -1,3 +1,4 @@
+import 'package:flash_feed/ui/screens/home/customize_category_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,14 +35,26 @@ class SettingsPage extends ConsumerWidget {
             },
           ),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.tune),
-            title: Text("Customize Feed"),
+          InkWell(
+            child: ListTile(
+              leading: Icon(Icons.tune),
+              title: Text("Customize Feed"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomizeCategoryScreen(),
+                  ),
+                );
+              },
+            ),
           ),
+          const Divider(),
           const ListTile(
             leading: Icon(Icons.notifications),
             title: Text("Notifications"),
           ),
+          const Divider(),
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text("About App"),

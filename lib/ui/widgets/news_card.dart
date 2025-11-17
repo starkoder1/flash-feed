@@ -1,17 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/utils/util.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 
-class NewsCard extends StatelessWidget {
+class NewsCard extends ConsumerWidget {
   const NewsCard({super.key, required this.newsItem});
 
   final NewsItem newsItem;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDarkMode = ref.watch(themeProvider);
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
@@ -52,7 +55,7 @@ class NewsCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: secondaryShade,
+                    color: isDarkMode ? darkmodeShade : secondaryShade,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(newsItem.category.toUpperCase()),
