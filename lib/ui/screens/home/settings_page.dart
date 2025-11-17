@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
-import 'package:flash_feed/utils/util.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});

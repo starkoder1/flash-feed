@@ -21,7 +21,7 @@ class NasaTechnologySource {
       List<NewsItem> newsList = [];
 
       for (var item in items) {
-        String _getText(String tag) =>
+        String getText(String tag) =>
             item.getElement(tag)?.innerText.trim() ?? '';
 
         // Extract image from <media:content> or inside <content:encoded>
@@ -38,7 +38,7 @@ class NasaTechnologySource {
         }
 
         // Extract author
-        String author = _getText('dc:creator');
+        String author = getText('dc:creator');
         if (author.isEmpty) author = 'NASA';
 
         // Extract category
@@ -52,7 +52,7 @@ class NasaTechnologySource {
         DateTime pubDate = DateTime.now();
         try {
           pubDate = DateTime.parse(
-            DateTime.parse(_getText('pubDate')).toUtc().toIso8601String(),
+            DateTime.parse(getText('pubDate')).toUtc().toIso8601String(),
           );
         } catch (_) {
           // fallback if parsing fails
@@ -60,9 +60,9 @@ class NasaTechnologySource {
 
         newsList.add(
           NewsItem(
-            title: _getText('title'),
-            description: _getText('description'),
-            link: _getText('link'),
+            title: getText('title'),
+            description: getText('description'),
+            link: getText('link'),
             imageUrl: imageUrl,
             author: author,
             publishedAt: pubDate,

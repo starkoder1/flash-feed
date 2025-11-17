@@ -1,10 +1,34 @@
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
+import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 
 class EngadgetSource {
   final String _rssUrl = 'https://www.engadget.com/rss.xml';
+
+  /// Parse RFC 2822 date format used by Engadget RSS feed
+  /// Example: "Sun, 16 Nov 2025 20:00:38 +0000"
+  DateTime _parseRFC2822Date(String dateString) {
+    try {
+      // Clean up the date string
+      final cleanDate = dateString.trim();
+
+      // Use DateFormat to parse RFC 2822 format
+      final formatter = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z');
+      return formatter.parse(cleanDate);
+    } catch (e) {
+      // Fallback: try alternative formats or return current time
+      try {
+        // Try without timezone
+        final formatter2 = DateFormat('EEE, dd MMM yyyy HH:mm:ss');
+        final withoutTz = dateString.replaceAll(RegExp(r'\s+[+-]\d{4}$'), '');
+        return formatter2.parse(withoutTz);
+      } catch (e2) {
+        print('Failed to parse date: $dateString, error: $e2');
+        return DateTime.now();
+      }
+    }
+  }
 
   Future<List<NewsItem>> fetchNews() async {
     final response = await http.get(Uri.parse(_rssUrl));
@@ -76,9 +100,10 @@ class EngadgetSource {
       DateTime publishedAt;
       try {
         publishedAt = pubDateStr != null
-            ? parseHttpDate(pubDateStr)
+            ? _parseRFC2822Date(pubDateStr)
             : DateTime.now();
-      } catch (_) {
+      } catch (e) {
+        print('Date parsing error for Engadget: $e, using current time');
         publishedAt = DateTime.now();
       }
 

@@ -1,6 +1,8 @@
+import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/splash_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogoScreen extends StatefulWidget {
   const LogoScreen({super.key});
@@ -12,14 +14,31 @@ class LogoScreen extends StatefulWidget {
 class _LogoScreenState extends State<LogoScreen> {
   @override
   void initState() {
+    _checkOnboardingStatus();
     super.initState();
+  }
 
+  Future<void> _checkOnboardingStatus() async {
     // Wait for full animation to finish before navigating
-    Future.delayed(const Duration(seconds: 5), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SplashScreenController()),
-      );
+    Future.delayed(const Duration(seconds: 5), () async {
+      final prefs = await SharedPreferences.getInstance();
+      final isShown = prefs.getBool('onboarding_shown') ?? false;
+      if (isShown) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePageController()),
+        );
+        debugPrint(isShown.toString());
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SplashScreenController(),
+          ),
+        );
+        prefs.setBool('onboarding_shown', true);
+        debugPrint(isShown.toString());
+      }
     });
   }
 

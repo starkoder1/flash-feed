@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/utils/util.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shimmer/shimmer.dart';
 
 class NewsCard extends StatelessWidget {
   const NewsCard({super.key, required this.newsItem});
@@ -25,10 +27,16 @@ class NewsCard extends StatelessWidget {
                 width: double.infinity,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.low, // keeps scroll smooth
-                placeholder: (_, __) => const SizedBox(
+                placeholder: (_, __) => SizedBox(
                   height: 200,
-                  child: Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 errorWidget: (_, __, ___) => Image.asset(
@@ -90,9 +98,22 @@ class NewsCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Spacer(),
-                  Icon(Icons.share),
+                  IconButton(
+                    onPressed: () {
+                      SharePlus.instance.share(
+                        ShareParams(
+                          uri: Uri.parse(newsItem.link),
+                          title: newsItem.title,
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.share),
+                  ),
                   SizedBox(width: 15),
-                  Icon(Icons.bookmark_border),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.bookmark_border),
+                  ),
                 ],
               ),
             ),

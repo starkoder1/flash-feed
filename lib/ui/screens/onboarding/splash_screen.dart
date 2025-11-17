@@ -1,4 +1,3 @@
-import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';

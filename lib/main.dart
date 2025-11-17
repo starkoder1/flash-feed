@@ -1,5 +1,4 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
-import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 256;
+
   runApp(
     const ProviderScope(
       child: MyApp(), // ✅ use MyApp here
@@ -33,7 +34,11 @@ class MyApp extends ConsumerWidget {
           backgroundColor: Colors.white,
           selectedColor: primaryShade,
         ),
-        appBarTheme: AppBarTheme(backgroundColor: primaryShade),
+        appBarTheme: AppBarTheme(
+          backgroundColor: primaryShade,
+          foregroundColor: Colors.white,
+        ),
+
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.manropeTextTheme().apply(
@@ -44,11 +49,15 @@ class MyApp extends ConsumerWidget {
 
       // 🌚 Dark Theme
       darkTheme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFF151515),
         chipTheme: ChipThemeData(
           selectedColor: Color(0xFF101C4D),
           backgroundColor: Colors.black,
         ), //we change the color in dark mode to blend in with the color of the individual chips container
-        appBarTheme: AppBarTheme(backgroundColor: Color(0xFF101C4D)),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF101C4D),
+          foregroundColor: Colors.white,
+        ),
         brightness: Brightness.dark,
         // scaffoldBackgroundColor: darkmodeShade,
         textTheme: GoogleFonts.manropeTextTheme().apply(

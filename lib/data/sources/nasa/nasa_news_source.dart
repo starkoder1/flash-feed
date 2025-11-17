@@ -19,11 +19,11 @@ class NasaNewsSource {
 
       return items.map((item) {
         // Extract text safely
-        String _text(String tag) =>
+        String text(String tag) =>
             item.getElement(tag)?.innerText.trim() ?? '';
 
         // Parse pubDate → DateTime
-        DateTime _parseDate(String date) {
+        DateTime parseDate(String date) {
           try {
             return DateTime.parse(date);
           } catch (_) {
@@ -45,12 +45,12 @@ class NasaNewsSource {
         }
 
         return NewsItem(
-          title: _text('title'),
-          description: _text('description'),
-          link: _text('link'),
+          title: text('title'),
+          description: text('description'),
+          link: text('link'),
           imageUrl: imageUrl,
-          author: _text('dc:creator').isNotEmpty ? _text('dc:creator') : 'NASA',
-          publishedAt: _parseDate(_text('pubDate')),
+          author: text('dc:creator').isNotEmpty ? text('dc:creator') : 'NASA',
+          publishedAt: parseDate(text('pubDate')),
           source: 'NASA',
           category: 'SPACE',
         );

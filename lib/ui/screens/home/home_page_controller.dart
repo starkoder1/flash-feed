@@ -1,5 +1,6 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
+import 'package:flash_feed/ui/widgets/hiding_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 // import 'package:flash_feed/screens/feed_page.dart';
 import 'package:flash_feed/ui/screens/home/settings_page.dart';
@@ -18,18 +19,19 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   int _selectedIndex = 0;
   late PageController
   _pageController; // Add this for controlling page animations
-
-  final List<Widget> _pages = const [HomePage(), SettingsPage()];
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(); // Initialize the controller
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _pageController.dispose(); // Dispose to avoid memory leaks
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -48,8 +50,14 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
+    // Define pages here to pass the scroll controller
+    final List<Widget> pages = [
+      HomePage(scrollController: _scrollController),
+      const SettingsPage(),
+    ];
 
     return Scaffold(
+      extendBody: true,
       backgroundColor: Color(0xFF101C4D),
       body: PageView(
         // Replace the simple body with PageView for animated transitions
@@ -61,28 +69,32 @@ class _MainScreenState extends ConsumerState<HomePageController> {
             _selectedIndex = index; // Sync the nav bar with page changes
           });
         },
-        children: _pages,
+        children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        backgroundColor: secondaryShade,
-        selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.shifting,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article_outlined),
-            activeIcon: Icon(Icons.article),
-            label: 'Feed',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+      bottomNavigationBar: HidingBottomNavBar(
+        controller: _scrollController,
+        duration: const Duration(milliseconds: 200),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          backgroundColor: secondaryShade,
+          selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          type: BottomNavigationBarType.shifting,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
+              activeIcon: Icon(Icons.article),
+              label: 'Feed',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings_outlined),
+              activeIcon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
     );
   }

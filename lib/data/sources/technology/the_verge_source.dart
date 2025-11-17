@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';

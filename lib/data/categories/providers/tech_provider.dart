@@ -4,7 +4,6 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/data/sources/technology/ars_technica_source.dart';
 import 'package:flash_feed/data/sources/technology/cnet_source.dart';
 import 'package:flash_feed/data/sources/technology/engadget_source.dart';
-import 'package:flash_feed/data/sources/nasa/nasa_jpl_source.dart';
 import 'package:flash_feed/data/sources/technology/the_verge_source.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
