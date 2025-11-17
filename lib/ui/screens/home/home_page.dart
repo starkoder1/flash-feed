@@ -20,80 +20,85 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:skeletonizer/skeletonizer.dart';
 
-class HomePage extends ConsumerWidget {
+final categoryMap = {
+  'Technology': techListProvider,
+  'World': worldListProvider,
+  'Environment': environmentListProvider,
+  'Automotive': automotiveListProvider,
+  'Space': spaceListProvider,
+  'Politics': politicsListProvider,
+  'Gaming': gameListProvider,
+  'Finance': financeListProvider,
+  'Sports': sportsListProvider,
+  'Health': healthListProvider,
+  'Movie': movieListProvider,
+  'NASA': nasaListProvider,
+};
+
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final categoryMap = {
-      'Technology': techListProvider,
-      'World': worldListProvider,
-      'Environment': environmentListProvider,
-      'Automotive': automotiveListProvider,
-      'Space': spaceListProvider,
-      'Politics': politicsListProvider,
-      'Gaming': gameListProvider,
-      'Finance': financeListProvider,
-      'Sports': sportsListProvider,
-      'Health': healthListProvider,
-      'Movie': movieListProvider,
-      'NASA': nasaListProvider,
-    };
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
 
-    return DefaultTabController(
-      length: categoryMap.length,
-      child: Scaffold(
-        backgroundColor: Colors.grey[300],
-        appBar: AppBar(
-          bottom: TabBar(
-            dividerColor: Colors.grey,
-            dividerHeight: 4,
-            // indicatorWeight: 16,
-            // indicator: UnderlineTabIndicator(),
-            indicatorColor: Colors.white,
-            indicatorAnimation: TabIndicatorAnimation.linear,
-            // padding: EdgeInsets.zero, // 🔥 removes default left/right padding
-            labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-            tabAlignment: TabAlignment.start,
-            labelColor: Colors.white,
-            labelStyle: TextStyle(
-              fontSize: 16,
-              // fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-            ),
-            unselectedLabelColor: secondaryShade,
+class _HomePageState extends ConsumerState<HomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-            isScrollable: true,
-            tabs: categoryMap.keys.map((String title) {
-              return Tab(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(title),
-                ),
-              );
-            }).toList(),
-          ),
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset("assets/logo_alt.png", height: 40, width: 40),
-              Text(
-                "lashFeed",
-                style: GoogleFonts.manrope(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                ),
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: categoryMap.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        elevation: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset("assets/logo_alt.png", height: 40, width: 40),
+            Text(
+              "lashFeed",
+              style: GoogleFonts.manrope(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
               ),
-            ],
-          ),
-          elevation: 0,
+            ),
+          ],
         ),
-        body: TabBarView(
-          children: categoryMap.values.map((provider) {
-            return NewsCategoryView(provider: provider);
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          indicatorColor: primaryShade,
+          labelColor: primaryShade,
+          unselectedLabelColor: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.color?.withOpacity(0.7),
+          labelStyle: GoogleFonts.manrope(fontWeight: FontWeight.w800),
+          unselectedLabelStyle: GoogleFonts.manrope(
+            fontWeight: FontWeight.w600,
+          ),
+          tabs: categoryMap.keys.map((String title) {
+            return Tab(text: title);
           }).toList(),
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: categoryMap.values.map((provider) {
+          return NewsCategoryView(provider: provider);
+        }).toList(),
       ),
     );
   }
