@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // Added for debugPrint
 import 'package:xml/xml.dart';
+import 'package:intl/intl.dart'; // Added for DateFormat, as requested
 
 /// Backend service to fetch news from the Ars Technica (Cars) RSS feed
 class AutomotiveArsTechnicaSource {
@@ -14,13 +15,23 @@ class AutomotiveArsTechnicaSource {
 
   Future<List<NewsItem>> fetchNews() async {
     List<NewsItem> allNews = [];
+    final Set<String> uniqueLinks = {}; // To track unique article URLs
 
     for (final url in feedUrls) {
       try {
         final items = await _fetchFeed(url);
-        allNews.addAll(items);
+        debugPrint(
+          '✅ Successfully fetched and parsed ${items.length} items from $url',
+        );
+        // Add only unique items to the list
+        for (final item in items) {
+          // The 'add' method on a Set returns true if the item was added (is unique)
+          if (uniqueLinks.add(item.link)) {
+            allNews.add(item);
+          }
+        }
       } catch (e) {
-        print('❌ Error fetching feed from $url: $e');
+        debugPrint('❌ Error fetching feed from $url: $e');
       }
     }
 
@@ -125,15 +136,25 @@ class AutomotiveArsTechnicaSource {
 
   /// Parse different RSS date formats safely
   DateTime _parseDate(String? dateStr) {
-    if (dateStr == null) return DateTime.now();
+    if (dateStr == null || dateStr.isEmpty) {
+      debugPrint(
+        '⚠️ Date string was null/empty for Ars Technica. Using DateTime.now().',
+      );
+      return DateTime.now();
+    }
     try {
-      // Handles RFC-1123 format (e.g., "Fri, 31 Oct 2025 18:33:53 +0000")
-      return HttpDate.parse(dateStr);
+      // Ars Technica uses RFC-2822 format (e.g., "Mon, 17 Nov 2025 14:32:23 +0000")
+      // The 'Z' pattern in DateFormat handles numeric timezones like +0000.
+      final formatter = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z');
+      return formatter.parse(dateStr.trim());
     } catch (_) {
       try {
-        // Fallback for ISO 8601 dates
-        return DateTime.parse(dateStr);
+        // Fallback for other common formats like RFC-1123 or ISO 8601
+        return HttpDate.parse(dateStr.trim());
       } catch (_) {
+        debugPrint(
+          '⚠️ Failed to parse date "$dateStr" for Ars Technica. Using DateTime.now().',
+        );
         return DateTime.now();
       }
     }

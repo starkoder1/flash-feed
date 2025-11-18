@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart';
+import 'package:intl/intl.dart';
 
 /// Backend service to fetch and merge multiple RSS feeds from CNET dynamically
 class AutomotiveCnetSource {
@@ -17,13 +19,24 @@ class AutomotiveCnetSource {
 
   Future<List<NewsItem>> fetchNews() async {
     List<NewsItem> allNews = [];
+    final Set<String> uniqueLinks = {}; // To track unique article URLs
 
     for (final url in feedUrls) {
       try {
         final items = await _fetchFeed(url);
-        allNews.addAll(items);
+        debugPrint(
+          '✅ Successfully fetched and parsed ${items.length} items from $url',
+        );
+        // Add only unique items to the list
+        for (final item in items) {
+          // The 'add' method on a Set returns true if the item was added,
+          // and false if it was already present.
+          if (uniqueLinks.add(item.link)) {
+            allNews.add(item);
+          }
+        }
       } catch (e) {
-        print('❌ Error fetching feed from $url: $e');
+        debugPrint('❌ Error fetching feed from $url: $e');
       }
     }
 
@@ -72,7 +85,10 @@ class AutomotiveCnetSource {
       final description =
           item.getElement('description')?.innerText.trim() ?? 'No description';
       final link = item.getElement('link')?.innerText.trim() ?? '';
-      final pubDate = _parseDate(item.getElement('pubDate')?.innerText);
+      final pubDate = _parseDate(
+        item.getElement('pubDate')?.innerText,
+        sourceTitle,
+      );
       final category =
           item.getElement('category')?.innerText.trim() ?? 'General';
 
@@ -124,17 +140,26 @@ class AutomotiveCnetSource {
   }
 
   /// Parse different RSS date formats safely
-  DateTime _parseDate(String? dateStr) {
-    if (dateStr == null) return DateTime.now();
+  DateTime _parseDate(String? dateStr, String sourceName) {
+    if (dateStr == null || dateStr.isEmpty) {
+      debugPrint(
+        '⚠️ Date string was null/empty for $sourceName. Using DateTime.now().',
+      );
+      return DateTime.now();
+    }
     try {
-      // HttpDate.parse is great for RFC-1123 dates (e.g., "Tue, 03 Jun 2008 11:05:30 GMT")
-      return HttpDate.parse(dateStr);
+      // CNET uses RFC 2822 format (e.g., "Wed, 12 Nov 2025 16:00:00 +0000")
+      // The 'Z' pattern in DateFormat handles numeric timezones like +0000.
+      final formatter = DateFormat('EEE, dd MMM yyyy HH:mm:ss Z');
+      return formatter.parse(dateStr.trim());
     } catch (_) {
       try {
-        // Fallback for ISO 8601 dates (e.g., "2008-06-03T11:05:30Z")
-        return DateTime.parse(dateStr);
+        // Fallback for other common formats
+        return HttpDate.parse(dateStr.trim());
       } catch (_) {
-        // If all parsing fails, return now
+        debugPrint(
+          '⚠️ Failed to parse date "$dateStr" for $sourceName. Using DateTime.now().',
+        );
         return DateTime.now();
       }
     }

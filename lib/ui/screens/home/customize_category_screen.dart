@@ -1,7 +1,8 @@
-import 'dart:math'; // Added for Random
+import 'dart:math';
 import 'package:flash_feed/data/features/category_customize_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
+import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +28,6 @@ class CustomizeCategoryScreen extends ConsumerStatefulWidget {
       _CategoryScreenState();
 }
 
-//function for showing warning dialogue box
 Future<bool> _showWarningDialogue(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
@@ -36,9 +36,7 @@ Future<bool> _showWarningDialogue(BuildContext context) async {
         title: Row(
           children: [Icon(Icons.info), SizedBox(width: 5), Text("Alert")],
         ),
-        content: const Text(
-          'Please select at least 3 category before leaving.',
-        ),
+        content: const Text('Please select at least 3 categories to continue.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -52,33 +50,27 @@ Future<bool> _showWarningDialogue(BuildContext context) async {
 }
 
 class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
-  // --- 1. Translated Gradients from your React code ---
   final List<LinearGradient> _gradients = [
-    // from-blue-500 to-cyan-500
     LinearGradient(
       colors: [Colors.blue.shade500, Colors.cyan.shade500],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
-    // from-emerald-500 to-teal-500
     LinearGradient(
       colors: [Colors.green.shade500, Colors.teal.shade500],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
-    // from-orange-500 to-amber-500
     LinearGradient(
       colors: [Colors.orange.shade500, Colors.amber.shade500],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
-    // from-purple-500 to-pink-500
     LinearGradient(
       colors: [Colors.purple.shade500, Colors.pink.shade500],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ),
-
     LinearGradient(
       colors: [Colors.pink.shade500, Colors.red.shade400],
       begin: Alignment.topLeft,
@@ -86,7 +78,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
     ),
   ];
 
-  // --- 2. Map to store the randomly assigned gradient for each card ---
   final Map<String, LinearGradient> _cardGradients = {};
   List<LinearGradient> _shuffledGradients = [];
   int _gradientIndex = 0;
@@ -100,7 +91,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
       return _cardGradients[categoryTitle]!;
     }
 
-    // Shuffle again if all gradients are used
     if (_gradientIndex >= _shuffledGradients.length) {
       _shuffledGradients.shuffle();
       _gradientIndex = 0;
@@ -112,7 +102,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
     return gradient;
   }
 
-  // --- 3. Updated categories list (removed 'color') ---
   final List<_CategoryInfo> _categories = [
     _CategoryInfo(
       icon: Icons.computer_outlined,
@@ -179,9 +168,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
   void initState() {
     super.initState();
     initGradients();
-    // Initialize the local state with the provider's state when the screen loads.
-    // This ensures that previously selected categories are shown as selected.
-    // Note: This is a one-time sync. The UI will then react to provider changes.
   }
 
   @override
@@ -191,9 +177,9 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
 
     return PopScope(
       canPop: selectedCategories.length >= 3,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop && selectedCategories.length < 3) {
-          await _showWarningDialogue(context);
+          _showWarningDialogue(context);
         }
       },
       child: Scaffold(
@@ -210,23 +196,23 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
         ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-
                 const SizedBox(height: 24),
                 Expanded(
                   child: GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    clipBehavior: Clip.none,
+                    padding: EdgeInsets.only(top: 10, bottom: 20),
                     physics: const BouncingScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           mainAxisSpacing: 16,
                           crossAxisSpacing: 16,
-                          childAspectRatio: 1, // square cards
+                          childAspectRatio: 1.5,
                         ),
                     itemCount: _categories.length,
                     itemBuilder: (context, index) {
@@ -234,8 +220,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
                       final isSelected = selectedCategories.contains(
                         category.categoryEnum,
                       );
-
-                      // --- 4. Get the gradient for the card ---
                       final gradient = isSelected
                           ? _getGradientForCategory(category.title)
                           : null;
@@ -244,7 +228,6 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
                         data: category,
                         isSelected: isSelected,
                         onTap: () => _toggleCategory(category.categoryEnum),
-                        // Pass the gradient to the card
                         selectedGradient: gradient,
                         isDarkMode: isDarkMode,
                       );
@@ -260,12 +243,12 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
   }
 }
 
-// --- 5. Updated _InterestCard ---
-class _InterestCard extends StatelessWidget {
+class _InterestCard extends StatefulWidget {
   final _CategoryInfo data;
   final bool isSelected;
   final VoidCallback onTap;
   final LinearGradient? selectedGradient;
+  final bool isDarkMode;
 
   const _InterestCard({
     required this.data,
@@ -274,127 +257,203 @@ class _InterestCard extends StatelessWidget {
     required this.selectedGradient,
     required this.isDarkMode,
   });
-  final bool isDarkMode;
+
+  @override
+  State<_InterestCard> createState() => _InterestCardState();
+}
+
+class _InterestCardState extends State<_InterestCard>
+    with TickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.96,
+    ).animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _scaleController.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    Future.delayed(Duration(milliseconds: 100), () {
+      _scaleController.reverse();
+    });
+  }
+
+  void _handleTapCancel() {
+    _scaleController.reverse();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        children: [
-          // MAIN CARD
-          Container(
-            width: double.infinity,
-            height: 160,
-            decoration: BoxDecoration(
-              gradient: isSelected ? selectedGradient : null,
-              color: isSelected ? null : Colors.white70,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDarkMode ? Colors.transparent : Colors.grey[200]!,
-                width: 1,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color:
-                            selectedGradient?.colors.first.withOpacity(0.3) ??
-                            Colors.black.withOpacity(0.12),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.white.withOpacity(0.3)
-                          : const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      data.icon,
-                      color: isSelected ? Colors.white : Colors.grey[800],
-                      size: 24,
-                    ),
-                  ),
-                  Text(
-                    data.title,
-                    style: GoogleFonts.manrope(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: isSelected ? Colors.white : Colors.black,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ⭐ FULL CARD SHIMMER EFFECT
-          // ⭐ FIXED SHIMMER (no leak in dark mode)
-          if (isSelected)
-            Positioned.fill(
-              child: ClipRRect(
+      onTap: widget.onTap,
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                child: Stack(
-                  children: [
-                    // This prevents glow from touching card edges
+                gradient: widget.isSelected ? widget.selectedGradient : null,
+                color: widget.isSelected ? null : Colors.white70,
+                border: Border.all(
+                  color: widget.isSelected
+                      ? Colors.transparent
+                      : (widget.isDarkMode
+                            ? Colors.transparent
+                            : Colors.grey[200]!),
+                  width: 1,
+                ),
+                // ENHANCED GLOW SHADOW FOR SELECTED CARDS
+                boxShadow: widget.isSelected
+                    ? [
+                        BoxShadow(
+                          color:
+                              widget.selectedGradient?.colors.first.withOpacity(
+                                0.4,
+                              ) ??
+                              Colors.black.withOpacity(0.15),
+                          blurRadius: 10, // Softer, larger glow
+                          spreadRadius: 4, // Expands outward
+                          offset: Offset.zero,
+                        ),
+                      ]
+                    : [],
+              ),
+              child: Stack(
+                children: [
+                  // 1. Border highlight
+
+                  // 2. MORE PROMINENT SHIMMER EFFECT
+                  if (widget.isSelected)
                     Positioned.fill(
-                      top: 10,
-                      bottom: 10,
-                      left: 10,
-                      right: 10,
-                      child: Shimmer.fromColors(
-                        direction: ShimmerDirection.ltr,
-                        baseColor: Colors.white.withOpacity(0.05),
-                        highlightColor: Colors.white.withOpacity(0.60),
-                        period: Duration(milliseconds: 1200),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(16),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.transparent,
+                          highlightColor: Colors.white.withOpacity(
+                            0.9,
+                          ), // 80% stronger
+                          period: Duration(
+                            milliseconds: 2000,
+                          ), // Slightly faster
+                          child: Container(
+                            color: Colors.white.withOpacity(
+                              0.12,
+                            ), // More visible overlay
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
 
-          // CHECKMARK
-          if (isSelected)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
+                  // 3. Glass overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withOpacity(
+                            widget.isSelected ? 0.05 : 0.02,
+                          ),
+                          Colors.black.withOpacity(
+                            widget.isSelected ? 0.05 : 0.02,
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: Icon(Icons.check, color: Colors.grey[900], size: 18),
+                  ),
+
+                  // 4. Content
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: widget.isSelected
+                                ? Colors.white.withOpacity(0.3)
+                                : const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            widget.data.icon,
+                            color: widget.isSelected
+                                ? Colors.white
+                                : Colors.grey[800],
+                            size: 24,
+                          ),
+                        ),
+                        Text(
+                          widget.data.title,
+                          style: GoogleFonts.manrope(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: widget.isSelected
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // 5. ENHANCED CHECKMARK
+                  if (widget.isSelected)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: primaryShade,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(
+                                0.15,
+                              ), // Stronger shadow
+                              blurRadius: 8, // Softer shadow
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Icon(Icons.check, color: Colors.white, size: 18),
+                      ),
+                    ),
+                ],
               ),
             ),
-        ],
+          );
+        },
       ),
     );
   }

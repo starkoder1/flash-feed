@@ -1,8 +1,12 @@
 import 'package:flash_feed/data/categories/providers/automotive_provider.dart';
+import 'package:flash_feed/data/categories/providers/environment_provider.dart';
 import 'package:flash_feed/data/categories/providers/finance_provider.dart';
 import 'package:flash_feed/data/categories/providers/gaming_provider.dart';
 import 'package:flash_feed/data/categories/providers/health_provider.dart';
 import 'package:flash_feed/data/categories/providers/movie_provider.dart';
+import 'package:flash_feed/data/categories/providers/nasa_provider.dart';
+import 'package:flash_feed/data/categories/providers/politics_provider.dart';
+import 'package:flash_feed/data/categories/providers/science_provider.dart';
 import 'package:flash_feed/data/categories/providers/space_provider.dart';
 import 'package:flash_feed/data/categories/providers/sports_provider.dart';
 import 'package:flash_feed/data/categories/providers/tech_provider.dart';
@@ -43,7 +47,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     // Define the order of categories for the UI
     _categories = [
-      NewsCategory.forYou,
+     NewsCategory.forYou,
       NewsCategory.world,
       NewsCategory.technology,
       NewsCategory.sports,
@@ -53,16 +57,16 @@ class _HomePageState extends ConsumerState<HomePage> {
       NewsCategory.gaming,
       NewsCategory.movie,
       NewsCategory.space,
+      NewsCategory.nasa,
+      NewsCategory.politics,
+      NewsCategory.environment,
+      NewsCategory.science,
     ];
   }
 
   void _onChipSelected(int index) {
     setState(() => _selectedIndex = index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    _pageController.jumpToPage(index);
   }
 
   @override
@@ -77,29 +81,39 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Row(
             children: List.generate(_categories.length, (index) {
               final isSelected = _selectedIndex == index;
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: ChoiceChip(
-                  elevation: 2,
-                  side: BorderSide.none,
-                  label: Text(
-                    _categories[index].name.toString().sentenceCase,
-                    style: GoogleFonts.manrope(
-                      color: isSelected
-                          ? Colors.white
-                          : isDarkMode
-                          ? Colors.white
-                          : Colors.black,
-                      fontWeight: isSelected
-                          ? FontWeight.w900
-                          : FontWeight.w500,
-                    ),
-                  ),
-                  showCheckmark: false,
-                  selected: isSelected,
 
-                  // backgroundColor: Colors.white,
-                  onSelected: (_) => _onChipSelected(index),
+                // --- ONLY THIS PART IS NEW ---
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOut,
+                  // --------------------------------
+                  child: ChoiceChip(
+                    elevation: 2,
+                    side: BorderSide.none,
+
+                    label: Text(
+                      _categories[index].name.toString().sentenceCase,
+                      style: GoogleFonts.manrope(
+                        color: isSelected
+                            ? Colors.white
+                            : isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                        fontWeight: isSelected
+                            ? FontWeight.w900
+                            : FontWeight.w500,
+                      ),
+                    ),
+
+                    showCheckmark: false,
+                    selected: isSelected,
+
+                    // keep your original behavior
+                    onSelected: (_) => _onChipSelected(index),
+                  ),
                 ),
               );
             }),
@@ -124,7 +138,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/logo_alt.png", height: 40, width: 40),
+                Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
                 Text(
                   "lashFeed",
                   style: GoogleFonts.manrope(
@@ -184,6 +198,15 @@ ProviderBase<AsyncValue<List<NewsItem>>> _providerForCategory(
       return movieListProvider;
     case NewsCategory.space:
       return spaceListProvider;
+    case NewsCategory.politics:
+      return politicsListProvider;
+    case NewsCategory.nasa:
+      return nasaListProvider;
+    case NewsCategory.environment:
+      return environmentListProvider;
+    case NewsCategory.science:
+      return scienceListProvider;
+
     // Add default or throw error for unhandled cases
     default:
       // This should not happen if all categories are handled.

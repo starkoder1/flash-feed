@@ -1,86 +1,109 @@
-// File: lib/services/news_service.dart
-
 import 'package:flash_feed/data/models/news_item.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
+import 'dart:io';
 
 class MedicalExpressSource {
+  // Define constants for XML namespaces to robustly parse the feed
+  static const String _mediaNamespace = 'http://search.yahoo.com/mrss/';
+
   final String _feedUrl = "https://medicalxpress.com/rss-feed/health-news/";
 
   /// Fetches and parses the RSS feed into a list of NewsItem objects.
   Future<List<NewsItem>> fetchNews() async {
+    final List<NewsItem> newsItems = [];
+    final Set<String> uniqueLinks = {};
+
     try {
       // 1. Fetch the data
-      final response = await http.get(Uri.parse(_feedUrl));
+      final response = await http.get(
+        Uri.parse(_feedUrl),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        },
+      );
 
       if (response.statusCode != 200) {
         throw Exception('Failed to load RSS feed: ${response.statusCode}');
       }
 
       // 2. Parse the XML string
-      final document = xml.XmlDocument.parse(response.body);
+      final document = xml.XmlDocument.parse(response.body.trim());
 
-      // Find the <rss> element, then the <channel> element inside it.
-      final rss = document.findElements('rss').firstOrNull;
-      final channel = rss?.findElements('channel').firstOrNull;
-      if (channel == null) {
-        throw Exception('Invalid RSS feed: missing <channel> element');
+      // 3. Find all <item> elements
+      final items = document.findAllElements('item');
+
+      for (final item in items) {
+        final link = item.getElement('link')?.innerText.trim() ?? '';
+
+        // Skip if the link is empty or already processed (deduplication)
+        if (link.isEmpty || !uniqueLinks.add(link)) {
+          continue;
+        }
+
+        final newsItem = _parseItem(item);
+        newsItems.add(newsItem);
       }
 
-      // 3. Find all <item> elements and map them to NewsItem objects
-      final newsItems = channel.findElements('item').map((itemElement) {
-        return _parseItem(itemElement);
-      }).toList();
-
+      debugPrint(
+        '✅ Successfully fetched and parsed ${newsItems.length} items from $_feedUrl',
+      );
+      // Sort by date, newest first
+      newsItems.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
       return newsItems;
     } catch (e) {
-      // In a real app, you'd want more robust error handling
-      print('Error fetching news: $e');
-      rethrow; // Re-throw the exception to be handled by the UI
+      debugPrint('❌ Error fetching or parsing news from $_feedUrl: $e');
+      throw Exception('Error fetching feed: $e');
     }
   }
 
   /// Helper function to parse a single <item> element into a NewsItem.
   NewsItem _parseItem(xml.XmlElement item) {
     // Extract data using the helper
-    final title = _findElementText(item, 'title') ?? 'No Title';
+    final title = item.getElement('title')?.innerText.trim() ?? 'No Title';
     final description =
-        _findElementText(item, 'description') ?? 'No Description';
-    final link = _findElementText(item, 'link') ?? '';
-    final category = _findElementText(item, 'category') ?? 'General';
-    final pubDateStr = _findElementText(item, 'pubDate');
-
-    // Parse the publication date, defaulting to now if parsing fails
-    final publishedAt = DateTime.tryParse(pubDateStr ?? '') ?? DateTime.now();
+        item.getElement('description')?.innerText.trim() ?? 'No Description';
+    final link = item.getElement('link')?.innerText.trim() ?? '';
+    final publishedAt = _parseDate(item.getElement('pubDate')?.innerText);
 
     // Handle the namespaced <media:thumbnail>
-    final mediaThumbnail = item.findElements('media:thumbnail').firstOrNull;
+    final mediaThumbnail = item
+        .findElements('thumbnail', namespace: _mediaNamespace)
+        .firstOrNull;
     final imageUrl = mediaThumbnail?.getAttribute('url') ?? '';
-
-    // --- Handling Missing Data ---
-    // The RSS feed you provided does NOT contain an <author> tag.
-    // We must provide a value for your 'required' model field.
-    final author = ''; // Default to empty string
 
     return NewsItem(
       title: title,
       description: description,
       link: link,
       imageUrl: imageUrl,
-      author: author,
+      author: 'Medical Xpress', // This feed does not provide an author
       publishedAt: publishedAt,
       source: 'Medical Xpress',
-      category: category,
+      category: 'HEALTH',
     );
   }
 
-  /// Safely finds an element and returns its text, or null.
-  String? _findElementText(xml.XmlElement element, String name) {
-    return element.findElements(name).firstOrNull?.innerText;
+  /// Parses RSS date strings safely using the intl package.
+  DateTime _parseDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      debugPrint(
+        '⚠️ Date string was null/empty for Medical Xpress. Using DateTime.now().',
+      );
+      return DateTime.now();
+    }
+    try {
+      // Format "E, dd MMM yyyy HH:mm:ss zzz" handles "Tue, 18 Nov 2025 13:22:03 EST"
+      final formatter = DateFormat("E, dd MMM yyyy HH:mm:ss zzz");
+      return formatter.parse(dateStr.trim());
+    } catch (e) {
+      debugPrint(
+        '⚠️ Failed to parse date "$dateStr" for Medical Xpress. Using DateTime.now(). Error: $e',
+      );
+      return DateTime.now();
+    }
   }
-}
-
-// Helper extension for safety, similar to other source files.
-extension _IterableX<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
 }

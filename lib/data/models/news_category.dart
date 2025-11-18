@@ -12,5 +12,5 @@ enum NewsCategory {
   movie,
   nasa,
   forYou,
-
+  science,
 }

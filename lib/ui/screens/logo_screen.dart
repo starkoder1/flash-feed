@@ -1,21 +1,24 @@
+import 'package:flash_feed/data/features/for_you_proivder.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/splash_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LogoScreen extends StatefulWidget {
+class LogoScreen extends ConsumerStatefulWidget {
   const LogoScreen({super.key});
 
   @override
-  State<LogoScreen> createState() => _LogoScreenState();
+  ConsumerState<LogoScreen> createState() => _LogoScreenState();
 }
 
-class _LogoScreenState extends State<LogoScreen> {
+class _LogoScreenState extends ConsumerState<LogoScreen> {
   @override
   void initState() {
     _checkOnboardingStatus();
     super.initState();
+    ref.read(forYouProivder.future);
   }
 
   Future<void> _checkOnboardingStatus() async {

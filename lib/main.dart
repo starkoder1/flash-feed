@@ -1,5 +1,6 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
