@@ -1,104 +1,158 @@
+import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
-import 'dart:async';
 
-// Assuming 'NewsItem' class is defined elsewhere
-// import 'news_model.dart'; 
-
-/// A data source for fetching sports news from Yahoo.
 class YahooSportsNewsSource {
+  static const String _dcNamespace = 'http://purl.org/dc/elements/1.1/';
+  static const String _mediaNamespace = 'http://search.yahoo.com/mrss/';
+  static const String _contentNamespace =
+      'http://purl.org/rss/1.0/modules/content/';
 
-  /// Fetches and parses the Yahoo Sports RSS feed.
-  /// Returns a List NewsItem or throws an exception if it fails.
-   Future<List<NewsItem>> fetchNews() async {
+  Future<List<NewsItem>> fetchNews() async {
     final List<NewsItem> newsItems = [];
-    
-    // URL for the Sports feed
+    final Set<String> uniqueLinks = {};
+
     const String rssUrl = "https://sports.yahoo.com/rss/";
 
     try {
-      // 1. Make the HTTP request
-      final response = await http.get(Uri.parse(rssUrl));
+      final response = await http.get(
+        Uri.parse(rssUrl),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        },
+      );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to load RSS feed. Status code: ${response.statusCode}');
+        throw Exception('Failed to load feed: ${response.statusCode}');
       }
 
-      // 2. Parse the XML string
       final document = xml.XmlDocument.parse(response.body);
-
-      // 3. Find all <item> elements
       final items = document.findAllElements('item');
 
-      // 4. Loop through each <item> and extract data
       for (final item in items) {
-        // Helper to safely get text from an element
         String safeFind(xml.XmlElement el, String tag) {
           return el.findElements(tag).firstOrNull?.text.trim() ?? '';
         }
-        
-        // Extract data matching the NewsItem model
+
         final title = safeFind(item, 'title');
         final description = safeFind(item, 'description');
         final link = safeFind(item, 'link');
-        
-        final pubDateString = safeFind(item, 'pubDate');
-        final publishedAt = DateTime.tryParse(pubDateString) ?? DateTime.now();
+        final pubDate = safeFind(item, 'pubDate');
+        final publishedAt = _parseDate(pubDate);
 
-        final source = item.findElements('source').firstOrNull?.text ?? 'Yahoo Sports';
-        final category = item.findElements('category').firstOrNull?.text ?? 'Sports';
-        final author = safeFind(item, 'dc:creator');
-        
-        // --- MODIFIED IMAGE LOGIC ---
+        final source =
+            item.findElements('source').firstOrNull?.text ?? 'Yahoo Sports';
+        final category =
+            item.findElements('category').firstOrNull?.text ?? 'Sports';
+
+        final author =
+            item
+                .findElements('creator', namespace: _dcNamespace)
+                .firstOrNull
+                ?.innerText
+                .trim() ??
+            '';
+
+        // -------- IMAGE LOGIC --------
         String imageUrl = '';
 
-        // 1. Try finding <media:content> first (standard method)
-        final mediaContent = item.findElements('media:content').firstOrNull;
+        final mediaContent = item
+            .findElements('content', namespace: _mediaNamespace)
+            .firstOrNull;
+
         if (mediaContent != null) {
           imageUrl = mediaContent.getAttribute('url') ?? '';
         }
 
-        // 2. If not found, try parsing <content:encoded> for an <img> tag
         if (imageUrl.isEmpty) {
-          final contentEncoded = item.findElements('content:encoded').firstOrNull?.text;
-          
-          if (contentEncoded != null && contentEncoded.isNotEmpty) {
-            // Use a simple regex to find the first <img> tag's src attribute
+          final contentEncoded = item
+              .findElements('encoded', namespace: _contentNamespace)
+              .firstOrNull
+              ?.text;
+
+          if (contentEncoded != null) {
             final regex = RegExp(
               r'<img[^>]+src="([^"]+)"',
               caseSensitive: false,
             );
-            
             final match = regex.firstMatch(contentEncoded);
-            if (match != null && match.groupCount >= 1) {
-              imageUrl = match.group(1) ?? '';
-            }
+            if (match != null) imageUrl = match.group(1) ?? '';
           }
         }
-        // --- END OF MODIFIED LOGIC ---
+        // --------------------------------
 
-        // 5. Create the NewsItem object and add to list
-        newsItems.add(
-          NewsItem(
-            title: title,
-            description: description,
-            link: link,
-            imageUrl: imageUrl, // Use the new image URL
-            author: author,
-            publishedAt: publishedAt,
-            source: source,
-            category: category,
-          ),
+        final newsItem = NewsItem(
+          title: title,
+          description: description,
+          link: link,
+          imageUrl: imageUrl,
+          author: author,
+          publishedAt: publishedAt,
+          source: source,
+          category: category,
         );
+
+        if (uniqueLinks.add(newsItem.link)) {
+          newsItems.add(newsItem);
+        }
       }
 
+      newsItems.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
       return newsItems;
-
     } catch (e) {
-      print('Error in YahooSportsNewsSource.fetchNews: $e');
-      // Re-throw the error so the caller can handle it
-      throw Exception('Could not fetch or parse Yahoo sports news: $e');
+      debugPrint('❌ Error: $e');
+      throw Exception('Could not fetch Yahoo Sports: $e');
     }
+  }
+
+  // -------- UNIVERSAL DATE PARSER --------
+  DateTime _parseDate(String? raw) {
+    if (raw == null || raw.trim().isEmpty) {
+      return DateTime.now();
+    }
+
+    // Clean invisible characters
+    String dateStr = raw
+        .replaceAll(RegExp(r'[\u200B-\u200F\uFEFF]'), '')
+        .replaceAll(RegExp(r'\u00A0'), ' ')
+        .replaceAll('&nbsp;', ' ')
+        .trim();
+
+    // Convert "+0000" → "GMT" for HttpDate
+    final numericTZ = RegExp(r'(\+|\-)\d{4}$');
+    if (numericTZ.hasMatch(dateStr)) {
+      dateStr = dateStr.replaceFirst(numericTZ, ' GMT');
+    }
+
+    // Try HttpDate first
+    try {
+      return HttpDate.parse(dateStr);
+    } catch (_) {}
+
+    // Try fallback formats
+    final formats = [
+      "EEE, dd MMM yyyy HH:mm:ss Z",
+      "EEE, dd MMM yyyy HH:mm:ss",
+      "EEE, dd MMM yyyy HH:mm Z",
+      "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
+      "EEE, dd MMM yyyy HH:mm 'GMT'",
+      "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      "yyyy-MM-dd HH:mm:ss",
+      "yyyy-MM-dd",
+    ];
+
+    for (var f in formats) {
+      try {
+        return DateFormat(f, 'en_US').parse(dateStr, true).toLocal();
+      } catch (_) {}
+    }
+
+    debugPrint('⚠️ Could not parse Yahoo date: "$raw"');
+    return DateTime.now();
   }
 }

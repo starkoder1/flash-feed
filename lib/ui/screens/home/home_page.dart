@@ -53,6 +53,10 @@ class _HomePageState extends ConsumerState<HomePage> {
       NewsCategory.gaming,
       NewsCategory.movie,
       NewsCategory.space,
+      NewsCategory.nasa,
+      NewsCategory.politics,
+      NewsCategory.environment,
+      NewsCategory.science,
     ];
   }
 
@@ -184,6 +188,15 @@ ProviderBase<AsyncValue<List<NewsItem>>> _providerForCategory(
       return movieListProvider;
     case NewsCategory.space:
       return spaceListProvider;
+    case NewsCategory.politics:
+      return spaceListProvider;
+    case NewsCategory.nasa:
+      return spaceListProvider;
+    case NewsCategory.environment:
+      return spaceListProvider;
+    case NewsCategory.science:
+      return spaceListProvider;
+
     // Add default or throw error for unhandled cases
     default:
       // This should not happen if all categories are handled.

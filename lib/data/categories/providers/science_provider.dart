@@ -5,14 +5,14 @@ import 'package:flash_feed/data/sources/automotive/automotive_cnet_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final automotiveListProvider = FutureProvider<List<NewsItem>>((ref) async {
+final scienceListProvider = FutureProvider<List<NewsItem>>((ref) async {
   List<NewsItem> onError(String source, e) {
     debugPrint(e.toString());
     debugPrint(source);
     return <NewsItem>[];
   }
 
-  final allAutoMotiveList = await Future.wait([
+  final allScienceList = await Future.wait([
     AutomotiveArsTechnicaSource().fetchNews().catchError(
       (error, stackTrace) =>
           onError('Ars Technica Automotive News Source Failed', error),
@@ -22,10 +22,10 @@ final automotiveListProvider = FutureProvider<List<NewsItem>>((ref) async {
           onError('CNET Automotive News Source Failed', error),
     ),
   ]);
-  final combinedAutomotiveList = allAutoMotiveList.expand((element) {
+  final combinedScienceList = allScienceList.expand((element) {
     return element;
   }).toList();
-  debugPrint(combinedAutomotiveList.length.toString());
-  combinedAutomotiveList.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
-  return combinedAutomotiveList;
+  debugPrint(combinedScienceList.length.toString());
+  combinedScienceList.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+  return combinedScienceList;
 });
