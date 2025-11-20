@@ -42,6 +42,7 @@ class ForYouProivder extends AsyncNotifier<List<NewsItem>> {
     ); //comparing the list
 
     final topLatestNewsList = mergedList.take(60).toList();
+    topLatestNewsList.shuffle();
     final remainingNewsList = mergedList.skip(60).toList();
     remainingNewsList.shuffle();
 

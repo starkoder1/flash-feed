@@ -51,6 +51,7 @@ dependencies:
   recase: ^4.1.0
   riverpod: ^3.0.3
   flutter_launcher_icons: ^0.14.4
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

@@ -18,6 +18,7 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/ui/widgets/chips_delgate.dart';
 import 'package:flash_feed/ui/widgets/skeleton_loading_card.dart';
+import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/ui/widgets/news_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +40,9 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   final PageController _pageController = PageController();
   // We will store the keys directly, not the providers, to simplify typing.
+  late final ScrollController _chipsScrollController;
+  bool _isChipsAtStart = true;
+  bool _isChipsAtEnd = false;
   late final List<NewsCategory> _categories;
   int _selectedIndex = 0;
 
@@ -47,7 +51,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     // Define the order of categories for the UI
     _categories = [
-     NewsCategory.forYou,
+      NewsCategory.forYou,
       NewsCategory.world,
       NewsCategory.technology,
       NewsCategory.sports,
@@ -62,6 +66,32 @@ class _HomePageState extends ConsumerState<HomePage> {
       NewsCategory.environment,
       NewsCategory.science,
     ];
+
+    _chipsScrollController = ScrollController();
+    _chipsScrollController.addListener(_updateChipsScrollState);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _chipsScrollController.removeListener(_updateChipsScrollState);
+    _chipsScrollController.dispose();
+    super.dispose();
+  }
+
+  void _updateChipsScrollState() {
+    final max = _chipsScrollController.position.maxScrollExtent;
+    final offset = _chipsScrollController.offset;
+
+    final start = offset <= 2;
+    final end = offset >= max - 2;
+
+    if (start != _isChipsAtStart || end != _isChipsAtEnd) {
+      setState(() {
+        _isChipsAtStart = start;
+        _isChipsAtEnd = end;
+      });
+    }
   }
 
   void _onChipSelected(int index) {
@@ -72,58 +102,117 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
+    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     Widget buildChipsRow() {
-      return Container(
-        padding: const EdgeInsets.only(bottom: 8, top: 4),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(_categories.length, (index) {
-              final isSelected = _selectedIndex == index;
+      return SizedBox(
+        height: 64,
+        child: Stack(
+          children: [
+            // ===== Scrollable chip row =====
+            Positioned.fill(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(top: 4, left: 5),
+                controller: _chipsScrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: List.generate(_categories.length, (index) {
+                    final isSelected = _selectedIndex == index;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: GestureDetector(
+                        onTap: () => _onChipSelected(index),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? (isDarkMode ? darkmodeShade : primaryShade)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            _categories[index].name.toString().sentenceCase,
+                            style: GoogleFonts.manrope(
+                              color: isSelected
+                                  ? Colors.white
+                                  : (isDarkMode ? Colors.white : Colors.black),
+                              fontWeight: isSelected
+                                  ? FontWeight.w900
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
 
-                // --- ONLY THIS PART IS NEW ---
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOut,
-                  // --------------------------------
-                  child: ChoiceChip(
-                    elevation: 2,
-                    side: BorderSide.none,
-
-                    label: Text(
-                      _categories[index].name.toString().sentenceCase,
-                      style: GoogleFonts.manrope(
-                        color: isSelected
-                            ? Colors.white
-                            : isDarkMode
-                            ? Colors.white
-                            : Colors.black,
-                        fontWeight: isSelected
-                            ? FontWeight.w900
-                            : FontWeight.w500,
+            // ===== Left fade =====
+            IgnorePointer(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _isChipsAtStart ? 0 : 1,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 26,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment
+                            .centerRight, // Fade from right (transparent) to left (background)
+                        end: Alignment.centerLeft,
+                        colors: [
+                          scaffoldBackgroundColor.withOpacity(0),
+                          scaffoldBackgroundColor.withOpacity(0.7),
+                          scaffoldBackgroundColor,
+                        ],
                       ),
                     ),
-
-                    showCheckmark: false,
-                    selected: isSelected,
-
-                    // keep your original behavior
-                    onSelected: (_) => _onChipSelected(index),
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            ),
+
+            // ===== Right fade =====
+            IgnorePointer(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _isChipsAtEnd ? 0 : 1,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    width: 26,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment
+                            .centerLeft, // Fade from left (transparent) to right (background)
+                        end: Alignment.centerRight,
+                        colors: [
+                          scaffoldBackgroundColor.withOpacity(0),
+                          scaffoldBackgroundColor.withOpacity(0.7),
+                          scaffoldBackgroundColor,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: scaffoldBackgroundColor,
 
       body: NestedScrollView(
         controller: widget.scrollController,
@@ -152,7 +241,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
 
           SliverPersistentHeader(
-            delegate: ChipsDelgate(child: buildChipsRow()),
+            delegate: ChipsDelgate(child: Center(child: buildChipsRow())),
             floating: true,
           ),
         ],
