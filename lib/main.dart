@@ -5,11 +5,13 @@ import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 256;
-
+  await Hive.initFlutter();
+  await Hive.openBox('bookmarks');
   runApp(
     const ProviderScope(
       child: MyApp(), // ✅ use MyApp here
@@ -31,6 +33,9 @@ class MyApp extends ConsumerWidget {
 
       // 🌞 Light Theme
       theme: ThemeData(
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+        ),
         chipTheme: ChipThemeData(
           backgroundColor: Colors.white,
           selectedColor: primaryShade,
@@ -50,12 +55,17 @@ class MyApp extends ConsumerWidget {
 
       // 🌚 Dark Theme
       darkTheme: ThemeData(
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.black,
+        ),
         scaffoldBackgroundColor: const Color(0xFF151515),
+        secondaryHeaderColor: Colors.black54,
         chipTheme: ChipThemeData(
           selectedColor: Color(0xFF101C4D),
           backgroundColor: Colors.black,
         ), //we change the color in dark mode to blend in with the color of the individual chips container
         appBarTheme: AppBarTheme(
+          surfaceTintColor: Colors.transparent,
           backgroundColor: Color(0xFF101C4D),
           foregroundColor: Colors.white,
         ),

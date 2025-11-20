@@ -1,15 +1,75 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:share_plus/share_plus.dart';
+
 import 'package:flash_feed/data/features/bookmarks_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
-import 'package:flutter/material.dart';
 import 'package:flash_feed/utils/util.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 
-class NewsCard extends ConsumerWidget {
-  const NewsCard({super.key, required this.newsItem});
+class BookmarkScreen extends ConsumerWidget {
+  const BookmarkScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bookmarks = ref.watch(bookMarksProvider);
+    final notifier = ref.read(bookMarksProvider.notifier);
+
+    if (bookmarks.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: Text("No bookmarks yet.", style: TextStyle(fontSize: 16)),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Bookmarks")),
+      body: ListView.builder(
+        itemCount: bookmarks.length,
+        itemBuilder: (context, index) {
+          final item = bookmarks[index];
+
+          return Dismissible(
+            key: ValueKey(item.link),
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerLeft, // Icon for left-to-right swipe
+              padding: const EdgeInsets.only(left: 24),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            secondaryBackground: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight, // Icon for right-to-left swipe
+              padding: const EdgeInsets.only(right: 24),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            direction:
+                DismissDirection.horizontal, // Allow swipe from both directions
+            onDismissed: (_) => notifier.removeBookmark(item),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => NewsWebViewScreen(news: item),
+                  ),
+                );
+              },
+              child: BookmarkCard(newsItem: item),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class BookmarkCard extends ConsumerWidget {
+  const BookmarkCard({super.key, required this.newsItem});
 
   final NewsItem newsItem;
 
@@ -17,13 +77,10 @@ class NewsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(bookMarksProvider.notifier);
     final isDarkMode = ref.watch(themeProvider);
-    final bookmarks = ref.watch(bookMarksProvider);
-    bool isBookmarked = notifier.isBookmarked(newsItem);
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-      // elevation: 1.25,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -34,17 +91,13 @@ class NewsCard extends ConsumerWidget {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                filterQuality: FilterQuality.low, // keeps scroll smooth
+                filterQuality: FilterQuality.low,
                 placeholder: (_, __) => SizedBox(
                   height: 200,
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey.shade300,
                     highlightColor: Colors.grey.shade100,
-                    child: Container(
-                      height: 200,
-                      width: double.infinity,
-                      color: Colors.white,
-                    ),
+                    child: Container(color: Colors.white),
                   ),
                 ),
                 errorWidget: (_, __, ___) => Image.asset(
@@ -58,7 +111,10 @@ class NewsCard extends ConsumerWidget {
                 top: 10,
                 right: 15,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: isDarkMode ? darkmodeShade : secondaryShade,
                     borderRadius: BorderRadius.circular(6),
@@ -68,6 +124,7 @@ class NewsCard extends ConsumerWidget {
               ),
             ],
           ),
+
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -95,6 +152,7 @@ class NewsCard extends ConsumerWidget {
               ],
             ),
           ),
+
           Align(
             alignment: Alignment.centerRight,
             child: Padding(
@@ -102,10 +160,13 @@ class NewsCard extends ConsumerWidget {
               child: Row(
                 children: [
                   Text(
-                    "${newsItem.source} • ${newsItem.publishedAt.day} ${_monthString(newsItem.publishedAt.month)} ${newsItem.publishedAt.year}",
+                    "${newsItem.source} • ${newsItem.publishedAt.day} "
+                    "${_monthString(newsItem.publishedAt.month)} "
+                    "${newsItem.publishedAt.year}",
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  Spacer(),
+                  const Spacer(),
+
                   IconButton(
                     tooltip: 'Share',
                     onPressed: () {
@@ -116,20 +177,16 @@ class NewsCard extends ConsumerWidget {
                         ),
                       );
                     },
-                    icon: Icon(Icons.share),
+                    icon: const Icon(Icons.share),
                   ),
-                  SizedBox(width: 15),
+
+                  const SizedBox(width: 15),
+
+                  /// DELETE FROM BOOKMARKS
                   IconButton(
-                    onPressed: () {
-                      if (isBookmarked) {
-                        notifier.removeBookmark(newsItem);
-                      } else if (!isBookmarked) {
-                        notifier.addBookmark(newsItem);
-                      }
-                    },
-                    icon: isBookmarked
-                        ? Icon(Icons.bookmark_outlined)
-                        : Icon(Icons.bookmark_border),
+                    tooltip: 'Remove Bookmark',
+                    onPressed: () => notifier.removeBookmark(newsItem),
+                    icon: const Icon(Icons.delete_outline),
                   ),
                 ],
               ),

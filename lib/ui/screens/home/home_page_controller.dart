@@ -1,4 +1,5 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
+import 'package:flash_feed/ui/screens/home/bookmark_screen.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flash_feed/ui/widgets/hiding_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class _MainScreenState extends ConsumerState<HomePageController> {
     // Define pages here to pass the scroll controller
     final List<Widget> pages = [
       HomePage(scrollController: _scrollController),
+      const BookmarkScreen(),
       const SettingsPage(),
     ];
 
@@ -77,16 +79,21 @@ class _MainScreenState extends ConsumerState<HomePageController> {
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          backgroundColor: secondaryShade,
+
           selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
           unselectedItemColor: Colors.grey,
           showUnselectedLabels: true,
-          type: BottomNavigationBarType.shifting,
+          type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined),
               activeIcon: Icon(Icons.article),
               label: 'Feed',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bookmark_outline),
+              activeIcon: Icon(Icons.bookmark),
+              label: 'Bookmarks',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings_outlined),
