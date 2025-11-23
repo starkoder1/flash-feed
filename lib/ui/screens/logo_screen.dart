@@ -24,11 +24,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
 
   Future<void> _checkOnboardingStatus() async {
     // Wait for full animation to finish before navigating
-<<<<<<< HEAD
     Future.delayed(const Duration(seconds: 6), () async {
-=======
-    Future.delayed(const Duration(seconds: 7), () async {
->>>>>>> origin/naveen
       final prefs = await SharedPreferences.getInstance();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
       if (isShown) {
@@ -76,11 +72,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                           // Text should appear AFTER logo has started moving
                           .animate()
                           .fadeIn(
-<<<<<<< HEAD
                             delay: 2
-=======
-                            delay: 3
->>>>>>> origin/naveen
                                 .seconds, // 2 sec wait + 0.8 sec slide start buffer
                             duration: 1.5.seconds,
                             curve: Curves.easeIn,
@@ -101,11 +93,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                       end: const Offset(-0.9, 0),
                       duration: 0.8.seconds,
                       curve: Curves.easeIn,
-<<<<<<< HEAD
                       delay: 1.seconds, // logo stays still for 2 seconds
-=======
-                      delay: 2.seconds, // logo stays still for 2 seconds
->>>>>>> origin/naveen
                     )
                     .scale(
                       begin: const Offset(1.0, 1.0),
@@ -126,11 +114,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                 letterSpacing: 1.2,
               ),
             ).animate().fadeIn(
-<<<<<<< HEAD
               delay: 3.seconds, // after logo + text animations
-=======
-              delay: 4.seconds, // after logo + text animations
->>>>>>> origin/naveen
               duration: 0.5.seconds,
               curve: Curves.easeInBack,
             ),

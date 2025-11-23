@@ -53,14 +53,6 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
     // Define pages here to pass the scroll controller
-<<<<<<< HEAD
-=======
-    final List<Widget> pages = [
-      HomePage(scrollController: _scrollController),
-      const BookmarkScreen(),
-      const SettingsPage(),
-    ];
->>>>>>> origin/naveen
 
     return Scaffold(
       extendBody: true,
