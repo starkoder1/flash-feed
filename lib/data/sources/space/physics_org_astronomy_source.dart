@@ -100,7 +100,7 @@ class PhysicsOrgAstronomySource {
       author: author,
       publishedAt: publishedAt,
       source: sourceName,
-      category: category,
+      category: 'space', // hardcoded
     );
   }
 

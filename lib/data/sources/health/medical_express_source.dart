@@ -82,8 +82,8 @@ class MedicalExpressSource {
       imageUrl: imageUrl,
       author: 'Medical Xpress', // This feed does not provide an author
       publishedAt: publishedAt,
-      source: 'Medical Xpress',
-      category: 'HEALTH',
+      source: 'MedicalXpress.com',
+      category: 'health',
     );
   }
 

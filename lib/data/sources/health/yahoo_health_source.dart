@@ -2,6 +2,7 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:xml/xml.dart' as xml;
 import 'dart:async';
 
@@ -37,7 +38,7 @@ class YahooHealthNewsSource {
       }
 
       // 2. Parse the XML string
-      final document = xml.XmlDocument.parse(response.body.trim());
+      final document = xml.XmlDocument.parse(getBody(response).trim());
 
       // 3. Find all <item> elements
       final items = document.findAllElements('item');
@@ -85,8 +86,8 @@ class YahooHealthNewsSource {
             imageUrl: imageUrl,
             author: author.isNotEmpty ? author : source,
             publishedAt: publishedAt,
-            source: source,
-            category: 'HEALTH',
+            source: 'Yahoo News - Latest News & Headlines',
+            category: 'health',
           ),
         );
       }

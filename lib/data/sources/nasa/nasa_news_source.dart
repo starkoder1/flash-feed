@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
@@ -33,7 +34,7 @@ class NasaNewsSource {
         throw Exception('Failed to load feed (status: ${response.statusCode})');
       }
 
-      final document = XmlDocument.parse(response.body);
+      final document = XmlDocument.parse(getBody(response));
       final items = document.findAllElements('item');
 
       for (final item in items) {
@@ -89,7 +90,7 @@ class NasaNewsSource {
             author: author,
             publishedAt: pubDate,
             source: 'NASA',
-            category: 'SPACE',
+            category: 'nasa',
           ),
         );
       }

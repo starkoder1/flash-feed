@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:flash_feed/data/models/news_item.dart'; // Make sure this path is correct
 
 /// Fetches and parses Screen Rant RSS feed dynamically
@@ -32,7 +33,7 @@ class ScreenRantSource {
         throw Exception('Failed to load RSS feed: ${response.statusCode}');
       }
 
-      final body = response.body.trim();
+      final body = getBody(response).trim();
       if (!body.contains('<rss')) {
         debugPrint(
           '❌ Non-XML response. Body starts with: ${body.substring(0, 150)}',
@@ -92,8 +93,8 @@ class ScreenRantSource {
             imageUrl: imageUrl,
             author: author,
             publishedAt: pubDate,
-            source: sourceTitle,
-            category: category,
+            source: 'Screen Rant - Movie News',
+            category: 'entertainment',
           ),
         );
       }

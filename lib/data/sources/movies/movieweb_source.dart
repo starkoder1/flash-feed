@@ -87,8 +87,8 @@ class MovieWebSource {
             imageUrl: imageUrl,
             author: author,
             publishedAt: pubDate,
-            source: sourceTitle,
-            category: category,
+            source: 'MovieWeb - Movie News',
+            category: 'entertainment',
           ),
         );
       }

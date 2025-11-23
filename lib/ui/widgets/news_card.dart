@@ -7,6 +7,7 @@ import 'package:flash_feed/utils/util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class NewsCard extends ConsumerWidget {
   const NewsCard({super.key, required this.newsItem});
@@ -19,6 +20,9 @@ class NewsCard extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final bookmarks = ref.watch(bookMarksProvider);
     bool isBookmarked = notifier.isBookmarked(newsItem);
+
+    // define default icon color based on theme or fallback to grey
+    final defaultIconColor = Theme.of(context).iconTheme.color ?? Colors.grey;
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -118,7 +122,7 @@ class NewsCard extends ConsumerWidget {
                     },
                     icon: Icon(Icons.share),
                   ),
-                  SizedBox(width: 15),
+                  // SizedBox(width: 15),
                   IconButton(
                     onPressed: () {
                       if (isBookmarked) {
@@ -127,9 +131,23 @@ class NewsCard extends ConsumerWidget {
                         notifier.addBookmark(newsItem);
                       }
                     },
-                    icon: isBookmarked
-                        ? Icon(Icons.bookmark_outlined)
-                        : Icon(Icons.bookmark_border),
+                    icon: TweenAnimationBuilder<Color?>(
+                      duration: 300.ms,
+                      tween: ColorTween(
+                        begin: defaultIconColor,
+                        end: isBookmarked ? primaryShade : defaultIconColor,
+                      ),
+                      builder: (_, color, __) {
+                        return Icon(
+                              isBookmarked
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_outline,
+                              color: color,
+                            )
+                            .animate(target: isBookmarked ? 1 : 0)
+                            .shake(duration: 300.ms, hz: 4);
+                      },
+                    ),
                   ),
                 ],
               ),

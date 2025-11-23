@@ -90,7 +90,7 @@ class CnetSource {
           author: author,
           publishedAt: publishedAt,
           source: sourceTitle,
-          category: category,
+          category: 'technology',
         );
 
         // Add only unique items to the list

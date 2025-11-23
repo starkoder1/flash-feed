@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
 
@@ -31,7 +32,7 @@ class YahooSportsNewsSource {
         throw Exception('Failed to load feed: ${response.statusCode}');
       }
 
-      final document = xml.XmlDocument.parse(response.body);
+      final document = xml.XmlDocument.parse(getBody(response));
       final items = document.findAllElements('item');
 
       for (final item in items) {
@@ -94,7 +95,7 @@ class YahooSportsNewsSource {
           author: author,
           publishedAt: publishedAt,
           source: source,
-          category: category,
+          category: 'sports', // hardcoded
         );
 
         if (uniqueLinks.add(newsItem.link)) {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:xml/xml.dart' as xml;
 
 class JplNewsService {
@@ -38,7 +39,7 @@ class JplNewsService {
       }
 
       // 2. Parse the XML string
-      final body = response.body.trim();
+      final body = getBody(response).trim();
       if (body.isEmpty) throw Exception('Empty RSS response from $_feedUrl');
 
       final document = xml.XmlDocument.parse(body);
@@ -116,7 +117,7 @@ class JplNewsService {
       author: author,
       publishedAt: publishedAt,
       source: sourceName,
-      category: 'SPACE', // hardcoded
+      category: 'nasa', // hardcoded
     );
   }
 

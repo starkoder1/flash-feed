@@ -92,7 +92,7 @@ class YahooScienceSource {
       author: author,
       publishedAt: publishedAt,
       source: sourceName,
-      category: category,
+      category: 'science', // hardcoded
     );
   }
 

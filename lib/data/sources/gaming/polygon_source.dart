@@ -127,8 +127,8 @@ class PolygonGamingNewsSource {
             imageUrl: imageUrl,
             author: author.isNotEmpty ? author : source,
             publishedAt: publishedAt,
-            source: source,
-            category: category,
+            source: 'Polygon.com - Gaming',
+            category: 'gaming',
           ),
         );
       }

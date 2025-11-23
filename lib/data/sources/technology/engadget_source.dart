@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 
@@ -32,7 +33,7 @@ class EngadgetSource {
         );
       }
 
-      final body = response.body.trim();
+      final body = getBody(response).trim();
       if (body.isEmpty) throw Exception('Empty RSS response from $_rssUrl');
 
       final document = XmlDocument.parse(body);
@@ -104,7 +105,7 @@ class EngadgetSource {
           author: author,
           publishedAt: publishedAt,
           source: sourceTitle,
-          category: category,
+          category: 'technology',
         );
 
         // Add only unique items to the list

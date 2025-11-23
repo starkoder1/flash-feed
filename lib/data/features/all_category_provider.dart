@@ -15,7 +15,7 @@ import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ForYouProivder extends AsyncNotifier<List<NewsItem>> {
+class AllCategoryProvider extends AsyncNotifier<List<NewsItem>> {
   @override
   Future<List<NewsItem>> build() async {
     final results = await Future.wait([
@@ -41,15 +41,11 @@ class ForYouProivder extends AsyncNotifier<List<NewsItem>> {
       (a, b) => b.publishedAt.compareTo(a.publishedAt),
     ); //comparing the list
 
-    final topLatestNewsList = mergedList.take(60).toList();
-    topLatestNewsList.shuffle();
-    final remainingNewsList = mergedList.skip(60).toList();
-    remainingNewsList.shuffle();
-
-    return [...topLatestNewsList, ...remainingNewsList];
+    return mergedList;
   }
 }
 
-final forYouProivder = AsyncNotifierProvider<ForYouProivder, List<NewsItem>>(
-  (ForYouProivder.new),
-);
+final allCategoryProvider =
+    AsyncNotifierProvider<AllCategoryProvider, List<NewsItem>>(
+      (AllCategoryProvider.new),
+    );

@@ -123,8 +123,8 @@ class IgnGamesNewsSource {
             imageUrl: imageUrl,
             author: author.isNotEmpty ? author : source,
             publishedAt: publishedAt,
-            source: source,
-            category: category,
+            source: 'IGN.com',
+            category: 'gaming',
           ),
         );
       }

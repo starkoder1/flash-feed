@@ -77,7 +77,7 @@ class TheVergeSource {
           author: author,
           publishedAt: publishedAt,
           source: 'The Verge',
-          category: category,
+          category: 'technology',
         );
 
         // Add only unique items to the list

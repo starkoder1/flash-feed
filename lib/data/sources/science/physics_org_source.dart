@@ -93,7 +93,7 @@ class PhysOrgSource {
       author: author,
       publishedAt: publishedAt,
       source: sourceName,
-      category: category,
+      category: 'science', // hardcoded
     );
   }
 

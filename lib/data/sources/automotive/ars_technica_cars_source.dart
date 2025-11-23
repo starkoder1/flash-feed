@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:http/http.dart' as http;
+import 'package:flash_feed/utils/string_cleaner.dart';
 import 'package:flutter/foundation.dart'; // Added for debugPrint
 import 'package:xml/xml.dart';
 import 'package:intl/intl.dart'; // Added for DateFormat, as requested
@@ -54,7 +55,7 @@ class AutomotiveArsTechnicaSource {
       throw Exception('Failed to load feed: ${response.statusCode}');
     }
 
-    final body = response.body.trim();
+    final body = getBody(response).trim();
     if (body.isEmpty) throw Exception('Empty RSS response from $url');
 
     final document = XmlDocument.parse(body);
@@ -126,7 +127,7 @@ class AutomotiveArsTechnicaSource {
           author: author,
           publishedAt: pubDate,
           source: sourceTitle,
-          category: category,
+          category: 'automotive',
         ),
       );
     }
