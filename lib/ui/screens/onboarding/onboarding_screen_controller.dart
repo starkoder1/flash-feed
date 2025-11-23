@@ -1,15 +1,17 @@
-import 'package:flash_feed/ui/screens/onboarding/splash_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flash_feed/ui/widgets/dot_indicator.dart';
 import 'package:flutter/material.dart';
 
-class SplashScreenController extends StatefulWidget {
-  const SplashScreenController({super.key});
+class OnboardingScreenController extends StatefulWidget {
+  const OnboardingScreenController({super.key});
 
   @override
-  State<SplashScreenController> createState() => _SplashScreenControllerState();
+  State<OnboardingScreenController> createState() =>
+      _OnboardingScreenControllerState();
 }
 
-class _SplashScreenControllerState extends State<SplashScreenController> {
+class _OnboardingScreenControllerState
+    extends State<OnboardingScreenController> {
   final PageController _controller = PageController();
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class _SplashScreenControllerState extends State<SplashScreenController> {
                   ),
                   SplashScreen(
                     controller: _controller,
-                    title: "Bookmark, share & comments on news",
+                    title: "Bookmark & share News",
                     description:
                         "Save articles to read later or share interesting stories with your friends instantly",
                     imagePath: "assets/shared.png",
