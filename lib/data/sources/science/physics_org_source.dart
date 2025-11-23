@@ -92,8 +92,8 @@ class PhysOrgSource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
-      category: category,
+      source: 'Phys.org',
+      category: 'science',
     );
   }
 

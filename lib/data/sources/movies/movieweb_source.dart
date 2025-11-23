@@ -88,7 +88,7 @@ class MovieWebSource {
             author: author,
             publishedAt: pubDate,
             source: sourceTitle,
-            category: category,
+            category: 'movies',
           ),
         );
       }

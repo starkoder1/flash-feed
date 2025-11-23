@@ -111,8 +111,8 @@ class NasaTechnologySource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
-      category: category,
+      source: 'Technology - NASA',
+      category: 'nasa',
     );
   }
 

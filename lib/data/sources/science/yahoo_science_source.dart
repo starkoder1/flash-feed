@@ -91,8 +91,8 @@ class YahooScienceSource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
-      category: category,
+      source: 'Yahoo News - Latest News & Headlines',
+      category: 'science',
     );
   }
 

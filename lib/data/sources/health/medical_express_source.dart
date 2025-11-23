@@ -83,7 +83,7 @@ class MedicalExpressSource {
       author: 'Medical Xpress', // This feed does not provide an author
       publishedAt: publishedAt,
       source: 'Medical Xpress',
-      category: 'HEALTH',
+      category: 'health',
     );
   }
 

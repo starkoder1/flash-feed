@@ -85,8 +85,8 @@ class YahooHealthNewsSource {
             imageUrl: imageUrl,
             author: author.isNotEmpty ? author : source,
             publishedAt: publishedAt,
-            source: source,
-            category: 'HEALTH',
+            source: 'Yahoo News - Latest News & Headlines',
+            category: 'health',
           ),
         );
       }

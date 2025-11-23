@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flash_feed/data/features/bookmarks_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
+import 'package:flash_feed/ui/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,7 +79,8 @@ class NewsCard extends ConsumerWidget {
                 Text(
                   newsItem.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
                   ),
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
@@ -86,9 +88,11 @@ class NewsCard extends ConsumerWidget {
                 const SizedBox(height: 10),
                 Text(
                   newsItem.description,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                  ),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -121,12 +125,10 @@ class NewsCard extends ConsumerWidget {
                   SizedBox(width: 15),
                   IconButton(
                     onPressed: () {
-                      if (isBookmarked) {
-                        notifier.removeBookmark(newsItem);
-                      } else if (!isBookmarked) {
-                        notifier.addBookmark(newsItem);
-                      }
+                      notifier.addBookmark(newsItem);
+                      AppSnackBar.show(context, "Bookmark added");
                     },
+
                     icon: isBookmarked
                         ? Icon(Icons.bookmark_outlined)
                         : Icon(Icons.bookmark_border),

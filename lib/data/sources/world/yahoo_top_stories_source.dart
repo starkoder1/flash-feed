@@ -90,8 +90,8 @@ class YahooTopNewsSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: source,
-          category: category,
+          source: 'Yahoo News - Latest News & Headlines',
+          category: 'world',
         );
 
         // Add to list only if the link is unique

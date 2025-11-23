@@ -98,7 +98,7 @@ class PhysicsOrgEnvironmentSource {
       author: author.isNotEmpty ? author : 'Phys.org',
       publishedAt: pubDate,
       source: 'Phys.org',
-      category: 'ENVIRONMENT',
+      category: 'enviroment',
     );
   }
 

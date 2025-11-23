@@ -89,7 +89,7 @@ class NasaNewsSource {
             author: author,
             publishedAt: pubDate,
             source: 'NASA',
-            category: 'SPACE',
+            category: 'nasa',
           ),
         );
       }

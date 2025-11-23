@@ -88,8 +88,8 @@ class PoliticsYahooSource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
-      category: category,
+      source: 'yahoo News - Latest News & Headlines',
+      category: 'politics',
     );
   }
 

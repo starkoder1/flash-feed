@@ -89,8 +89,8 @@ class CnetSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: sourceTitle,
-          category: category,
+          source: 'CNET',
+          category: 'technology',
         );
 
         // Add only unique items to the list

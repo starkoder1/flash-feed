@@ -94,8 +94,8 @@ class ArsTechnicaSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: sourceTitle,
-          category: category,
+          source: 'Ars Technica',
+          category: 'technology',
         );
 
         // Add only unique items to the list
