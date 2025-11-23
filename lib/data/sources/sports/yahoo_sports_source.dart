@@ -94,8 +94,8 @@ class YahooSportsNewsSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: source,
-          category: 'sports', // hardcoded
+          source: 'Yahoo! Sports',
+          category: 'sports',
         );
 
         if (uniqueLinks.add(newsItem.link)) {

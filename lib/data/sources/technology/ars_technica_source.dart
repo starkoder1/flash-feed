@@ -95,7 +95,7 @@ class ArsTechnicaSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: sourceTitle,
+          source: 'Ars Technica',
           category: 'technology',
         );
 

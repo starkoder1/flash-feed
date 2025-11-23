@@ -76,7 +76,7 @@ class NasaImageSource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
+      source: 'NASA Image of the Day',
       category: 'nasa',
     );
   }

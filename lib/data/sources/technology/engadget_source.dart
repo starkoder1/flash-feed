@@ -104,7 +104,7 @@ class EngadgetSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: sourceTitle,
+          source: 'Engadget',
           category: 'technology',
         );
 

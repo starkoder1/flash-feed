@@ -41,7 +41,16 @@ class AllCategoryProvider extends AsyncNotifier<List<NewsItem>> {
       (a, b) => b.publishedAt.compareTo(a.publishedAt),
     ); //comparing the list
 
+<<<<<<< HEAD:lib/data/features/all_category_provider.dart
     return mergedList;
+=======
+    final topLatestNewsList = mergedList.take(60).toList();
+    topLatestNewsList.shuffle();
+    final remainingNewsList = mergedList.skip(60).toList();
+    remainingNewsList.shuffle();
+
+    return [...topLatestNewsList, ...remainingNewsList];
+>>>>>>> origin/naveen:lib/data/features/for_you_proivder.dart
   }
 }
 

@@ -126,7 +126,7 @@ class AutomotiveArsTechnicaSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: pubDate,
-          source: sourceTitle,
+          source: 'Cars - Ars Technica',
           category: 'automotive',
         ),
       );

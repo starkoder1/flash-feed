@@ -1,9 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
+<<<<<<< HEAD
+=======
+import 'package:flash_feed/ui/widgets/app_snackbar.dart';
+>>>>>>> origin/naveen
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:share_plus/share_plus.dart';
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/naveen
 import 'package:flash_feed/data/features/bookmarks_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
@@ -49,7 +56,21 @@ class BookmarkScreen extends ConsumerWidget {
             ),
             direction:
                 DismissDirection.horizontal, // Allow swipe from both directions
+<<<<<<< HEAD
             onDismissed: (_) => notifier.removeBookmark(item),
+=======
+            onDismissed: (_) {
+              notifier.removeBookmark(item);
+
+              AppSnackBar.show(
+                context,
+                "Bookmark removed",
+                actionLabel: "UNDO",
+                onAction: () => notifier.addBookmark(item),
+              );
+            },
+
+>>>>>>> origin/naveen
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -185,7 +206,20 @@ class BookmarkCard extends ConsumerWidget {
                   /// DELETE FROM BOOKMARKS
                   IconButton(
                     tooltip: 'Remove Bookmark',
+<<<<<<< HEAD
                     onPressed: () => notifier.removeBookmark(newsItem),
+=======
+                    onPressed: () {
+                      notifier.removeBookmark(newsItem);
+
+                      AppSnackBar.show(
+                        context,
+                        "Bookmark removed",
+                        actionLabel: "UNDO",
+                        onAction: () => notifier.addBookmark(newsItem),
+                      );
+                    },
+>>>>>>> origin/naveen
                     icon: const Icon(Icons.delete_outline),
                   ),
                 ],

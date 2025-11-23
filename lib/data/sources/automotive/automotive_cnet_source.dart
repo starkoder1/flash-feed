@@ -130,7 +130,7 @@ class AutomotiveCnetSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: pubDate,
-          source: sourceTitle,
+          source: 'CNET',
           category: 'automotive',
         ),
       );

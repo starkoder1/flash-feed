@@ -116,7 +116,7 @@ class JplNewsService {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
+      source: ' NASA Jet Propulsion Laboratory',
       category: 'nasa', // hardcoded
     );
   }

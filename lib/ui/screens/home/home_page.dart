@@ -112,13 +112,21 @@ class _HomePageState extends ConsumerState<HomePage>
 
     Widget buildChipsRow() {
       return SizedBox(
+<<<<<<< HEAD
         height: 60,
+=======
+        height: 64,
+>>>>>>> origin/naveen
         child: Stack(
           children: [
             // ===== Scrollable chip row =====
             Positioned.fill(
               child: SingleChildScrollView(
+<<<<<<< HEAD
                 padding: EdgeInsets.only(top: 0, left: 5),
+=======
+                padding: EdgeInsets.only(top: 4, left: 5),
+>>>>>>> origin/naveen
                 controller: _chipsScrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),

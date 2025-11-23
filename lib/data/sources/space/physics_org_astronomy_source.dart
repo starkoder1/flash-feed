@@ -99,8 +99,8 @@ class PhysicsOrgAstronomySource {
       imageUrl: imageUrl,
       author: author,
       publishedAt: publishedAt,
-      source: sourceName,
-      category: 'space', // hardcoded
+      source: 'Phys.org',
+      category: 'space',
     );
   }
 

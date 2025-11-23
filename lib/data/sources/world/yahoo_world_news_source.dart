@@ -91,8 +91,8 @@ class YahooWorldNewsSource {
           imageUrl: imageUrl,
           author: author,
           publishedAt: publishedAt,
-          source: source,
-          category: 'world', // hardcoded category
+          source: 'Yahoo News - Latest News & Headlines',
+          category: 'world',
         );
 
         // Add to list only if the link is unique
