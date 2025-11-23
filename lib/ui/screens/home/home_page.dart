@@ -11,7 +11,8 @@ import 'package:flash_feed/data/categories/providers/space_provider.dart';
 import 'package:flash_feed/data/categories/providers/sports_provider.dart';
 import 'package:flash_feed/data/categories/providers/tech_provider.dart';
 import 'package:flash_feed/data/categories/providers/world_provider.dart';
-import 'package:flash_feed/data/features/for_you_proivder.dart';
+import 'package:flash_feed/data/features/all_category_provider.dart';
+import 'package:flash_feed/data/features/for_you_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/data/models/news_item.dart';
@@ -37,7 +38,8 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage>
+    with AutomaticKeepAliveClientMixin {
   final PageController _pageController = PageController();
   // We will store the keys directly, not the providers, to simplify typing.
   late final ScrollController _chipsScrollController;
@@ -45,6 +47,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _isChipsAtEnd = false;
   late final List<NewsCategory> _categories;
   int _selectedIndex = 0;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -101,18 +106,19 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final isDarkMode = ref.watch(themeProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
     Widget buildChipsRow() {
       return SizedBox(
-        height: 64,
+        height: 60,
         child: Stack(
           children: [
             // ===== Scrollable chip row =====
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 4, left: 5),
+                padding: EdgeInsets.only(top: 0, left: 5),
                 controller: _chipsScrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -246,14 +252,20 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
 
-        body: PageView(
+        body: PageView.builder(
           controller: _pageController,
           onPageChanged: (index) {
             setState(() => _selectedIndex = index);
           },
-          children: _categories.map((category) {
-            return NewsCategoryView(category: category);
-          }).toList(),
+          itemBuilder: (context, index) {
+            final category = _categories[index];
+            return NewsCategoryView(
+              category: category,
+              myIndex: index,
+              userSelectedIndex:
+                  _selectedIndex, //index user is currently looking at
+            );
+          },
         ),
       ),
     );
@@ -263,7 +275,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 /// A helper function to map a NewsCategory to its corresponding provider.
 /// This avoids the need for a map with complex generic types and provides
 /// the concrete provider type needed for `ref.invalidate`.
-ProviderBase<AsyncValue<List<NewsItem>>> _providerForCategory(
+ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
   NewsCategory category,
 ) {
   switch (category) {
@@ -303,15 +315,54 @@ ProviderBase<AsyncValue<List<NewsItem>>> _providerForCategory(
   }
 }
 
-class NewsCategoryView extends ConsumerWidget {
+class NewsCategoryView extends ConsumerStatefulWidget {
   final NewsCategory category;
+  final int myIndex; //my index means the index of the category
+  final int
+  userSelectedIndex; //the index of the category which user is curently looking at
 
-  const NewsCategoryView({super.key, required this.category});
+  const NewsCategoryView({
+    super.key,
+    required this.category,
+    required this.myIndex,
+    required this.userSelectedIndex,
+  });
+  @override
+  ConsumerState<NewsCategoryView> createState() => _NewsCategoryViewState();
+}
+
+class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  // Determine whether to keep this page alive based on its distance from the user selected index
+  bool get wantKeepAlive {
+    final myIndex = widget.myIndex;
+    final userSelectedIndex = widget.userSelectedIndex;
+    final int distance = (myIndex - userSelectedIndex).abs();
+
+    if (distance <= 2) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //to update keep alive when userSelectedIndex changes
+  @override
+  void didUpdateWidget(covariant NewsCategoryView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the user selected index has changed, we need to update keepAlive
+    if (oldWidget.userSelectedIndex != widget.userSelectedIndex) {
+      updateKeepAlive();
+    }
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Get the specific provider for this category
-    final provider = _providerForCategory(category);
+  Widget build(BuildContext context) {
+    super.build(context);
+    final category =
+        widget.category; // Get the specific provider for this category
+    final provider = providerForCategory(category);
     final newsAsyncValue = ref.watch(provider);
 
     return newsAsyncValue.when(

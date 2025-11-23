@@ -1,4 +1,5 @@
-import 'package:flash_feed/data/features/for_you_proivder.dart';
+import 'package:flash_feed/data/features/all_category_provider.dart';
+import 'package:flash_feed/data/features/for_you_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/splash_screen_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +19,12 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
   void initState() {
     _checkOnboardingStatus();
     super.initState();
-    ref.read(forYouProivder.future);
+    ref.read(allCategoryProvider.future);
   }
 
   Future<void> _checkOnboardingStatus() async {
     // Wait for full animation to finish before navigating
-    Future.delayed(const Duration(seconds: 7), () async {
+    Future.delayed(const Duration(seconds: 6), () async {
       final prefs = await SharedPreferences.getInstance();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
       if (isShown) {
@@ -71,7 +72,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                           // Text should appear AFTER logo has started moving
                           .animate()
                           .fadeIn(
-                            delay: 3
+                            delay: 2
                                 .seconds, // 2 sec wait + 0.8 sec slide start buffer
                             duration: 1.5.seconds,
                             curve: Curves.easeIn,
@@ -92,7 +93,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                       end: const Offset(-0.9, 0),
                       duration: 0.8.seconds,
                       curve: Curves.easeIn,
-                      delay: 2.seconds, // logo stays still for 2 seconds
+                      delay: 1.seconds, // logo stays still for 2 seconds
                     )
                     .scale(
                       begin: const Offset(1.0, 1.0),
@@ -113,7 +114,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
                 letterSpacing: 1.2,
               ),
             ).animate().fadeIn(
-              delay: 4.seconds, // after logo + text animations
+              delay: 3.seconds, // after logo + text animations
               duration: 0.5.seconds,
               curve: Curves.easeInBack,
             ),

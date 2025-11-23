@@ -21,12 +21,18 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   late PageController
   _pageController; // Add this for controlling page animations
   late ScrollController _scrollController;
+  late final List<Widget> pages;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(); // Initialize the controller
     _scrollController = ScrollController();
+    pages = [
+      HomePage(scrollController: _scrollController),
+      const BookmarkScreen(),
+      const SettingsPage(),
+    ];
   }
 
   @override
@@ -40,23 +46,13 @@ class _MainScreenState extends ConsumerState<HomePageController> {
     setState(() {
       _selectedIndex = index;
     });
-    _pageController.animateToPage(
-      // Animate to the new page with a smooth slide
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    _pageController.jumpToPage(index);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
     // Define pages here to pass the scroll controller
-    final List<Widget> pages = [
-      HomePage(scrollController: _scrollController),
-      const BookmarkScreen(),
-      const SettingsPage(),
-    ];
 
     return Scaffold(
       extendBody: true,
