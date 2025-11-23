@@ -1,6 +1,8 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
 import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/onboarding_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/onboarding_screen_controller.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,7 +79,7 @@ class MyApp extends ConsumerWidget {
         ),
       ),
 
-      home: LogoScreen(), //  You can navigate to SettingsPage from here
+      home: OnboardingScreenController(), //  You can navigate to SettingsPage from here
     );
   }
 }

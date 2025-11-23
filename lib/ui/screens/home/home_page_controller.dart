@@ -18,8 +18,7 @@ class HomePageController extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<HomePageController> {
   int _selectedIndex = 0;
-  late PageController
-  _pageController; // Add this for controlling page animations
+  late PageController _pageController; // Add this for controlling page animations
   late ScrollController _scrollController;
   late final List<Widget> pages;
 
@@ -54,49 +53,58 @@ class _MainScreenState extends ConsumerState<HomePageController> {
     final isDarkMode = ref.watch(themeProvider);
     // Define pages here to pass the scroll controller
 
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: Color(0xFF101C4D),
-      body: PageView(
-        // Replace the simple body with PageView for animated transitions
-        controller: _pageController,
-        reverse:
-            false, // Reverses the slide direction: tapping right tab slides left-to-right, vice versa
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index; // Sync the nav bar with page changes
-          });
-        },
-        children: pages,
-      ),
-      bottomNavigationBar: HidingBottomNavBar(
-        controller: _scrollController,
-        duration: const Duration(milliseconds: 200),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+    // ✅ FIXED: Wrapped in PopScope to handle Bottom Bar back navigation
+    return PopScope(
+      canPop: _selectedIndex == 0,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) return;
+        _onItemTapped(0); // Go back to "Feed"
+      },
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: const Color(0xFF101C4D),
+        body: PageView(
+          // Replace the simple body with PageView for animated transitions
+          controller: _pageController,
+          reverse: false, 
+          // ✅ FIXED: Disable swipe here so it doesn't conflict with News Categories swipe
+          physics: const NeverScrollableScrollPhysics(),
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index; // Sync the nav bar with page changes
+            });
+          },
+          children: pages,
+        ),
+        bottomNavigationBar: HidingBottomNavBar(
+          controller: _scrollController,
+          duration: const Duration(milliseconds: 200),
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
 
-          selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
-          unselectedItemColor: Colors.grey,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              activeIcon: Icon(Icons.article),
-              label: 'Feed',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_outline),
-              activeIcon: Icon(Icons.bookmark),
-              label: 'Bookmarks',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings_outlined),
-              activeIcon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
+            selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
+            unselectedItemColor: Colors.grey,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.article_outlined),
+                activeIcon: Icon(Icons.article),
+                label: 'Feed',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.bookmark_outline),
+                activeIcon: Icon(Icons.bookmark),
+                label: 'Bookmarks',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings_outlined),
+                activeIcon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+          ),
         ),
       ),
     );

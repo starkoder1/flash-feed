@@ -50,13 +50,18 @@ class EngadgetSource {
       final items = channelElement.findAllElements('item');
 
       for (var item in items) {
-        final title = item.getElement('title')?.innerText.trim() ?? 'No title';
+        // Strip HTML from title and description
+        final rawTitle =
+            item.getElement('title')?.innerText.trim() ?? 'No title';
+        final title = _stripHtml(rawTitle);
+
         final link = item.getElement('link')?.innerText.trim() ?? '';
 
         // Description Cleaning
-        String description =
+        String rawDescription =
             item.getElement('description')?.innerText.trim() ??
             'No description';
+        String description = _stripHtml(rawDescription);
         // Remove Engadget attribution line
         description = description
             .replaceAll(
@@ -150,5 +155,16 @@ class EngadgetSource {
         return DateTime.now();
       }
     }
+  }
+
+  /// Utility to remove HTML tags from a string.
+  String _stripHtml(String htmlText) {
+    // This regex finds any HTML tag and replaces it with a space.
+    final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false);
+    // Replace multiple whitespace characters with a single space.
+    return htmlText
+        .replaceAll(regex, ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 }

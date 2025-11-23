@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flash_feed/ui/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:share_plus/share_plus.dart';
 
+// Keep your existing imports
 import 'package:flash_feed/data/features/bookmarks_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
+import 'package:flash_feed/ui/widgets/app_snackbar.dart';
 
 class BookmarkScreen extends ConsumerWidget {
   const BookmarkScreen({super.key});
@@ -19,16 +21,53 @@ class BookmarkScreen extends ConsumerWidget {
     final bookmarks = ref.watch(bookMarksProvider);
     final notifier = ref.read(bookMarksProvider.notifier);
 
-    if (bookmarks.isEmpty) {
-      return const Scaffold(
-        body: Center(
-          child: Text("No bookmarks yet.", style: TextStyle(fontSize: 16)),
+    // -----------------------------------------------------------------
+    // HELPER: The Safe Way to Delete & Undo without crashing
+    // -----------------------------------------------------------------
+    void handleDelete(BuildContext ctx, NewsItem item) {
+      // 1. Remove the item (This updates the list)
+      notifier.removeBookmark(item);
+
+      // 2. Show the custom snackbar which will auto-dismiss
+      showCustomSnackBar(
+        context: ctx,
+        message: "Bookmark Removed",
+        duration: const Duration(seconds: 3),
+        trailing: TextButton(
+          style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
+          onPressed: () {
+            notifier.addBookmark(item);
+            ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
+          },
+          child: const Text('UNDO', style: TextStyle(color: Colors.amber)),
         ),
+      ); // This was already here, just cleaning up the surrounding code.
+    }
+
+    // EMPTY STATE
+    if (bookmarks.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Bookmarks",
+            style: GoogleFonts.manrope(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        body: const Center(child: Text("No bookmarks added yet.")),
       );
     }
 
+    // LIST STATE
     return Scaffold(
-      appBar: AppBar(title: const Text("Bookmarks")),
+      appBar: AppBar(
+        title: Text(
+          "Bookmarks",
+          style: GoogleFonts.manrope(fontSize: 20, fontWeight: FontWeight.w900),
+        ),
+      ),
       body: ListView.builder(
         itemCount: bookmarks.length,
         itemBuilder: (context, index) {
@@ -36,31 +75,23 @@ class BookmarkScreen extends ConsumerWidget {
 
           return Dismissible(
             key: ValueKey(item.link),
+            direction: DismissDirection.horizontal,
             background: Container(
               color: Colors.red,
-              alignment: Alignment.centerLeft, // Icon for left-to-right swipe
+              alignment: Alignment.centerLeft,
               padding: const EdgeInsets.only(left: 24),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             secondaryBackground: Container(
               color: Colors.red,
-              alignment: Alignment.centerRight, // Icon for right-to-left swipe
+              alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 24),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
-            direction:
-                DismissDirection.horizontal, // Allow swipe from both directions
             onDismissed: (_) {
-              notifier.removeBookmark(item);
-
-              AppSnackBar.show(
-                context,
-                "Bookmark removed",
-                actionLabel: "UNDO",
-                onAction: () => notifier.addBookmark(item),
-              );
+              // Call the safe helper function
+              handleDelete(context, item);
             },
-
             child: InkWell(
               onTap: () {
                 Navigator.push(
@@ -70,7 +101,11 @@ class BookmarkScreen extends ConsumerWidget {
                   ),
                 );
               },
-              child: BookmarkCard(newsItem: item),
+              child: BookmarkCard(
+                newsItem: item,
+                // Pass the delete logic down to the button
+                onDeletePressed: () => handleDelete(context, item),
+              ),
             ),
           );
         },
@@ -80,21 +115,30 @@ class BookmarkScreen extends ConsumerWidget {
 }
 
 class BookmarkCard extends ConsumerWidget {
-  const BookmarkCard({super.key, required this.newsItem});
+  const BookmarkCard({
+    super.key,
+    required this.newsItem,
+    required this.onDeletePressed, // Receive the function
+  });
 
   final NewsItem newsItem;
+  final VoidCallback onDeletePressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(bookMarksProvider.notifier);
     final isDarkMode = ref.watch(themeProvider);
+    // Fallback colors if your util variables aren't found
+    final tagBgColor = isDarkMode
+        ? const Color(0xFF424242)
+        : const Color(0xFFEEEEEE);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.only(bottom: 4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // IMAGE SECTION
           Stack(
             children: [
               CachedNetworkImage(
@@ -108,7 +152,11 @@ class BookmarkCard extends ConsumerWidget {
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey.shade300,
                     highlightColor: Colors.grey.shade100,
-                    child: Container(color: Colors.white),
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 errorWidget: (_, __, ___) => Image.asset(
@@ -127,7 +175,7 @@ class BookmarkCard extends ConsumerWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? darkmodeShade : secondaryShade,
+                    color: tagBgColor, // Use local var or your util vars
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(newsItem.category.toUpperCase()),
@@ -136,6 +184,7 @@ class BookmarkCard extends ConsumerWidget {
             ],
           ),
 
+          // TITLE & DESCRIPTION
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -146,7 +195,8 @@ class BookmarkCard extends ConsumerWidget {
                 Text(
                   newsItem.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
                   ),
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
@@ -154,9 +204,11 @@ class BookmarkCard extends ConsumerWidget {
                 const SizedBox(height: 10),
                 Text(
                   newsItem.description,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w100,
+                    fontSize: 14,
+                  ),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -164,57 +216,92 @@ class BookmarkCard extends ConsumerWidget {
             ),
           ),
 
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 20, bottom: 15, left: 12),
-              child: Row(
-                children: [
-                  Text(
-                    "${newsItem.source} • ${newsItem.publishedAt.day} "
-                    "${_monthString(newsItem.publishedAt.month)} "
-                    "${newsItem.publishedAt.year}",
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const Spacer(),
+          // META ROW (Date, Source, Buttons)
+          Padding(
+            padding: const EdgeInsets.only(right: 20, bottom: 15, left: 12),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final style = Theme.of(context).textTheme.bodySmall!.copyWith(
+                  fontWeight: FontWeight.w100,
+                  fontSize: 14,
+                );
 
-                  IconButton(
-                    tooltip: 'Share',
-                    onPressed: () {
-                      SharePlus.instance.share(
-                        ShareParams(
-                          uri: Uri.parse(newsItem.link),
-                          title: newsItem.title,
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.share),
-                  ),
+                final combined =
+                    "${newsItem.source} • ${newsItem.publishedAt.day} ${_monthString(newsItem.publishedAt.month)} ${newsItem.publishedAt.year}";
 
-                  const SizedBox(width: 15),
+                // Reserve 96px for the two IconButtons
+                final fits = _fitsInOneLine(
+                  combined,
+                  style,
+                  constraints.maxWidth - 96,
+                );
 
-                  /// DELETE FROM BOOKMARKS
-                  IconButton(
-                    tooltip: 'Remove Bookmark',
-                    onPressed: () {
-                      notifier.removeBookmark(newsItem);
+                return Row(
+                  children: [
+                    Expanded(
+                      child: fits
+                          ? Text(
+                              combined,
+                              style: style,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  newsItem.source,
+                                  style: style,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  "${newsItem.publishedAt.day} ${_monthString(newsItem.publishedAt.month)} ${newsItem.publishedAt.year}",
+                                  style: style,
+                                ),
+                              ],
+                            ),
+                    ),
 
-                      AppSnackBar.show(
-                        context,
-                        "Bookmark removed",
-                        actionLabel: "UNDO",
-                        onAction: () => notifier.addBookmark(newsItem),
-                      );
-                    },
-                    icon: const Icon(Icons.delete_outline),
-                  ),
-                ],
-              ),
+                    // Share Button
+                    IconButton(
+                      tooltip: 'Share',
+                      onPressed: () {
+                        SharePlus.instance.share(
+                          ShareParams(
+                            uri: Uri.parse(newsItem.link),
+                            title: newsItem.title,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.share),
+                    ),
+
+                    // Delete Button
+                    IconButton(
+                      color: const Color(0xFFE53935),
+                      tooltip: 'Remove Bookmark',
+                      onPressed: onDeletePressed, // Uses the safe helper
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  bool _fitsInOneLine(String text, TextStyle style, double maxWidth) {
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: maxWidth);
+
+    return !tp.didExceedMaxLines;
   }
 
   String _monthString(int month) {

@@ -41,11 +41,12 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage>
     with AutomaticKeepAliveClientMixin {
   final PageController _pageController = PageController();
-  // We will store the keys directly, not the providers, to simplify typing.
   late final ScrollController _chipsScrollController;
   bool _isChipsAtStart = true;
   bool _isChipsAtEnd = false;
   late final List<NewsCategory> _categories;
+  // 👇 1. Added Keys to track each tab's position
+  late final List<GlobalKey> _categoryKeys;
   int _selectedIndex = 0;
 
   @override
@@ -54,7 +55,6 @@ class _HomePageState extends ConsumerState<HomePage>
   @override
   void initState() {
     super.initState();
-    // Define the order of categories for the UI
     _categories = [
       NewsCategory.forYou,
       NewsCategory.world,
@@ -72,6 +72,9 @@ class _HomePageState extends ConsumerState<HomePage>
       NewsCategory.science,
     ];
 
+    // Initialize a unique key for every category
+    _categoryKeys = List.generate(_categories.length, (_) => GlobalKey());
+
     _chipsScrollController = ScrollController();
     _chipsScrollController.addListener(_updateChipsScrollState);
   }
@@ -85,6 +88,7 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   void _updateChipsScrollState() {
+    if (!_chipsScrollController.hasClients) return;
     final max = _chipsScrollController.position.maxScrollExtent;
     final offset = _chipsScrollController.offset;
 
@@ -99,9 +103,26 @@ class _HomePageState extends ConsumerState<HomePage>
     }
   }
 
+  // 👇 2. Helper to auto-scroll to the selected chip
+  void _scrollToChip(int index) {
+    final context = _categoryKeys[index].currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.5, // 0.5 means "center this item in the scroll view"
+      );
+    }
+  }
+
   void _onChipSelected(int index) {
     setState(() => _selectedIndex = index);
     _pageController.jumpToPage(index);
+    // Trigger the scroll animation when tapped or when back button is used
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToChip(index);
+    });
   }
 
   @override
@@ -118,7 +139,7 @@ class _HomePageState extends ConsumerState<HomePage>
             // ===== Scrollable chip row =====
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 0, left: 5),
+                padding: const EdgeInsets.only(top: 0, left: 5),
                 controller: _chipsScrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -127,6 +148,8 @@ class _HomePageState extends ConsumerState<HomePage>
                     final isSelected = _selectedIndex == index;
 
                     return Padding(
+                      // Assign the GlobalKey here so we can find this widget later
+                      key: _categoryKeys[index],
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: GestureDetector(
                         onTap: () => _onChipSelected(index),
@@ -172,8 +195,7 @@ class _HomePageState extends ConsumerState<HomePage>
                     width: 26,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment
-                            .centerRight, // Fade from right (transparent) to left (background)
+                        begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
                         colors: [
                           scaffoldBackgroundColor.withOpacity(0),
@@ -198,8 +220,7 @@ class _HomePageState extends ConsumerState<HomePage>
                     width: 26,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment
-                            .centerLeft, // Fade from left (transparent) to right (background)
+                        begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
                           scaffoldBackgroundColor.withOpacity(0),
@@ -217,64 +238,71 @@ class _HomePageState extends ConsumerState<HomePage>
       );
     }
 
-    return Scaffold(
-      backgroundColor: scaffoldBackgroundColor,
+    return PopScope(
+      canPop: _selectedIndex == 0,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) return;
+        _onChipSelected(0); // This will now also auto-scroll to the first tab
+      },
+      child: Scaffold(
+        backgroundColor: scaffoldBackgroundColor,
 
-      body: NestedScrollView(
-        controller: widget.scrollController,
-        floatHeaderSlivers: true,
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            forceElevated: innerBoxIsScrolled,
-            pinned: true,
-            floating: true,
-            elevation: 0,
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
-                Text(
-                  "lashFeed",
-                  style: GoogleFonts.manrope(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+        body: NestedScrollView(
+          controller: widget.scrollController,
+          floatHeaderSlivers: true,
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+              forceElevated: innerBoxIsScrolled,
+              pinned: true,
+              floating: true,
+              elevation: 0,
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
+                  Text(
+                    "lashFeed",
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          SliverPersistentHeader(
-            delegate: ChipsDelgate(child: Center(child: buildChipsRow())),
-            floating: true,
-          ),
-        ],
+            SliverPersistentHeader(
+              delegate: ChipsDelgate(child: Center(child: buildChipsRow())),
+              floating: true,
+            ),
+          ],
 
-        body: PageView.builder(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() => _selectedIndex = index);
-          },
-          itemBuilder: (context, index) {
-            final category = _categories[index];
-            return NewsCategoryView(
-              category: category,
-              myIndex: index,
-              userSelectedIndex:
-                  _selectedIndex, //index user is currently looking at
-            );
-          },
+          body: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() => _selectedIndex = index);
+              // 👇 3. Sync scroll when user swipes the body content
+              _scrollToChip(index);
+            },
+            itemBuilder: (context, index) {
+              final category = _categories[index];
+              return NewsCategoryView(
+                category: category,
+                myIndex: index,
+                userSelectedIndex: _selectedIndex,
+              );
+            },
+          ),
         ),
       ),
     );
   }
 }
 
+// ... (The rest of the file: providerForCategory, NewsCategoryView etc. remains unchanged)
 /// A helper function to map a NewsCategory to its corresponding provider.
-/// This avoids the need for a map with complex generic types and provides
-/// the concrete provider type needed for `ref.invalidate`.
 ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
   NewsCategory category,
 ) {
@@ -307,19 +335,15 @@ ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
       return environmentListProvider;
     case NewsCategory.science:
       return scienceListProvider;
-
-    // Add default or throw error for unhandled cases
     default:
-      // This should not happen if all categories are handled.
       throw UnimplementedError('Provider for $category not found.');
   }
 }
 
 class NewsCategoryView extends ConsumerStatefulWidget {
   final NewsCategory category;
-  final int myIndex; //my index means the index of the category
-  final int
-  userSelectedIndex; //the index of the category which user is curently looking at
+  final int myIndex;
+  final int userSelectedIndex;
 
   const NewsCategoryView({
     super.key,
@@ -334,12 +358,10 @@ class NewsCategoryView extends ConsumerStatefulWidget {
 class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
     with AutomaticKeepAliveClientMixin {
   @override
-  // Determine whether to keep this page alive based on its distance from the user selected index
   bool get wantKeepAlive {
     final myIndex = widget.myIndex;
     final userSelectedIndex = widget.userSelectedIndex;
     final int distance = (myIndex - userSelectedIndex).abs();
-
     if (distance <= 2) {
       return true;
     } else {
@@ -347,11 +369,9 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
     }
   }
 
-  //to update keep alive when userSelectedIndex changes
   @override
   void didUpdateWidget(covariant NewsCategoryView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the user selected index has changed, we need to update keepAlive
     if (oldWidget.userSelectedIndex != widget.userSelectedIndex) {
       updateKeepAlive();
     }
@@ -360,8 +380,7 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final category =
-        widget.category; // Get the specific provider for this category
+    final category = widget.category;
     final provider = providerForCategory(category);
     final newsAsyncValue = ref.watch(provider);
 
@@ -383,21 +402,15 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
             itemCount: newsList.length,
             itemBuilder: (context, index) {
               final news = newsList[index];
-              debugPrint("BUILDING CARD → ${news.imageUrl}");
-              // check disk cache (async, non-blocking)
               DefaultCacheManager()
                   .getFileFromCache(news.imageUrl)
                   .then((fileInfo) {
                     if (fileInfo == null) {
-                      print(
-                        "DISK CACHE: NOT FOUND → will download on first show: ${news.imageUrl}",
-                      );
-                    } else {
-                      print("DISK CACHE: FOUND → ${fileInfo.file.path}");
+                      // debug print logic
                     }
                   })
                   .catchError((e) {
-                    print("CACHE CHECK ERROR: $e");
+                    // error logic
                   });
 
               return InkWell(

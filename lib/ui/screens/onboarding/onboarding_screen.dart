@@ -3,8 +3,8 @@ import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({
+class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({
     super.key,
     required this.controller,
     required this.title,

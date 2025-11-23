@@ -1,7 +1,7 @@
 import 'package:flash_feed/data/features/all_category_provider.dart';
 import 'package:flash_feed/data/features/for_you_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
-import 'package:flash_feed/ui/screens/onboarding/splash_screen_controller.dart';
+import 'package:flash_feed/ui/screens/onboarding/onboarding_screen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +37,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const SplashScreenController(),
+            builder: (context) => const OnboardingScreenController(),
           ),
         );
         prefs.setBool('onboarding_shown', true);

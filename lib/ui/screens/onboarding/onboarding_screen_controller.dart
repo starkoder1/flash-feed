@@ -1,15 +1,16 @@
-import 'package:flash_feed/ui/screens/onboarding/splash_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/onboarding_screen.dart';
 import 'package:flash_feed/ui/widgets/dot_indicator.dart';
 import 'package:flutter/material.dart';
 
-class SplashScreenController extends StatefulWidget {
-  const SplashScreenController({super.key});
+class OnboardingScreenController extends StatefulWidget {
+  const OnboardingScreenController({super.key});
 
   @override
-  State<SplashScreenController> createState() => _SplashScreenControllerState();
+  State<OnboardingScreenController> createState() =>
+      _SplashScreenControllerState();
 }
 
-class _SplashScreenControllerState extends State<SplashScreenController> {
+class _SplashScreenControllerState extends State<OnboardingScreenController> {
   final PageController _controller = PageController();
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class _SplashScreenControllerState extends State<SplashScreenController> {
                 physics: NeverScrollableScrollPhysics(),
                 controller: _controller,
                 children: [
-                  SplashScreen(
+                  OnboardingScreen(
                     controller: _controller,
                     title: "Explore latest news",
                     description:
@@ -32,19 +33,26 @@ class _SplashScreenControllerState extends State<SplashScreenController> {
                     imagePath: "assets/search_news.png",
                     isFirstScreen: true,
                   ),
-                  SplashScreen(
+                  OnboardingScreen(
                     controller: _controller,
                     title: "Find news with better filters",
                     description:
                         "Customize your feed by selecting categories, topics, and regions that matter most to you for a smarter news experience",
                     imagePath: "assets/categories.png",
                   ),
-                  SplashScreen(
+                  OnboardingScreen(
                     controller: _controller,
-                    title: "Bookmark, share & comments on news",
+                    title: "Bookmark & share news",
                     description:
                         "Save articles to read later or share interesting stories with your friends instantly",
                     imagePath: "assets/shared.png",
+                  ),
+                  OnboardingScreen(
+                    controller: _controller,
+                    title: 'Uninterrupted Reading',
+                    description:
+                        'Stay focused with a smooth, distraction-free news experience',
+                    imagePath: 'assets/ad_free.png',
                     isLastScreen: true,
                   ),
                   // SplashScreenTwo(controller: _controller),
@@ -53,7 +61,7 @@ class _SplashScreenControllerState extends State<SplashScreenController> {
               ),
             ),
             SizedBox(height: 30),
-            DotIndicator(controller: _controller, count: 3),
+            DotIndicator(controller: _controller, count: 4),
           ],
         ),
       ),
