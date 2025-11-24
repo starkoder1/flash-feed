@@ -52,7 +52,7 @@ class NewsCard extends ConsumerWidget {
                   ),
                 ),
                 errorWidget: (_, __, ___) => Image.asset(
-                  "assets/logo.png",
+                  "assets/error.png",
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,

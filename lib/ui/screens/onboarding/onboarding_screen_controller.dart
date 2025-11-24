@@ -7,10 +7,11 @@ class OnboardingScreenController extends StatefulWidget {
 
   @override
   State<OnboardingScreenController> createState() =>
-      _SplashScreenControllerState();
+      _OnboardingScreenControllerState();
 }
 
-class _SplashScreenControllerState extends State<OnboardingScreenController> {
+class _OnboardingScreenControllerState
+    extends State<OnboardingScreenController> {
   final PageController _controller = PageController();
   @override
   Widget build(BuildContext context) {

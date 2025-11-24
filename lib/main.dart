@@ -1,27 +1,31 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
-import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
-import 'package:flash_feed/ui/screens/onboarding/onboarding_screen.dart';
-import 'package:flash_feed/ui/screens/onboarding/onboarding_screen_controller.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // This setup is CORRECT for enabling Edge-to-Edge mode
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, 
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
+
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 256;
   await Hive.initFlutter();
   await Hive.openBox('bookmarks');
-  runApp(
-    const ProviderScope(
-      child: MyApp(), // ✅ use MyApp here
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-//  ConsumerWidget for theme change
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -33,20 +37,26 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
-      // 🌞 Light Theme
+      // Light Theme
       theme: ThemeData(
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        // Removed the incorrect systemOverlayStyle property from here
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
         ),
         chipTheme: ChipThemeData(
           backgroundColor: Colors.white,
           selectedColor: primaryShade,
         ),
+        // ✅ FIXED: systemOverlayStyle is now correctly inside AppBarTheme
         appBarTheme: AppBarTheme(
           backgroundColor: primaryShade,
           foregroundColor: Colors.white,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark, // Icons dark on light app background
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: Brightness.dark,
+          ),
         ),
-
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.manropeTextTheme().apply(
@@ -55,31 +65,37 @@ class MyApp extends ConsumerWidget {
         ),
       ),
 
-      // 🌚 Dark Theme
+      // Dark Theme
       darkTheme: ThemeData(
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        // Removed the incorrect systemOverlayStyle property from here
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.black,
         ),
         scaffoldBackgroundColor: const Color(0xFF151515),
         secondaryHeaderColor: Colors.black54,
-        chipTheme: ChipThemeData(
+        chipTheme: const ChipThemeData(
           selectedColor: Color(0xFF101C4D),
           backgroundColor: Colors.black,
-        ), //we change the color in dark mode to blend in with the color of the individual chips container
-        appBarTheme: AppBarTheme(
+        ),
+        // ✅ FIXED: systemOverlayStyle is now correctly inside AppBarTheme
+        appBarTheme: const AppBarTheme(
           surfaceTintColor: Colors.transparent,
           backgroundColor: Color(0xFF101C4D),
           foregroundColor: Colors.white,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.light, // Icons light on dark app background
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
         ),
         brightness: Brightness.dark,
-        // scaffoldBackgroundColor: darkmodeShade,
         textTheme: GoogleFonts.manropeTextTheme().apply(
           bodyColor: Colors.white,
           displayColor: Colors.white,
         ),
       ),
 
-      home: OnboardingScreenController(), //  You can navigate to SettingsPage from here
+      home: const LogoScreen(),
     );
   }
 }

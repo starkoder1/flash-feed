@@ -19,7 +19,10 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
   void initState() {
     _checkOnboardingStatus();
     super.initState();
-    ref.read(allCategoryProvider.future);
+    
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
+      ref.read(allCategoryProvider.future);
+    });
   }
 
   Future<void> _checkOnboardingStatus() async {

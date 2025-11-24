@@ -280,6 +280,7 @@ class _HomePageState extends ConsumerState<HomePage>
           ],
 
           body: PageView.builder(
+            itemCount: _categories.length,
             controller: _pageController,
             onPageChanged: (index) {
               setState(() => _selectedIndex = index);
