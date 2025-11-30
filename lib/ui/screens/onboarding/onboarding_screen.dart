@@ -69,7 +69,7 @@ class OnboardingScreen extends StatelessWidget {
                             text: "PREVIOUS",
                             iconAlign: IconAlignment.start,
                             btnHeight: 48,
-                            btnWidth: 180,
+                            btnWidth: 160,
                             onTap: () {
                               if (controller.hasClients) {
                                 controller.previousPage(
@@ -84,9 +84,9 @@ class OnboardingScreen extends StatelessWidget {
                           ),
                     const SizedBox(width: 12),
                     CustomElevatedButton(
-                      text: "NEXT",
+                      text: isFirstScreen ? "GET STARTED" : "NEXT",
                       btnHeight: 48,
-                      btnWidth: isFirstScreen ? 300 : 180,
+                      btnWidth: isFirstScreen ? 300 : 160,
                       onTap: () {
                         if (isLastScreen) {
                           Navigator.pushReplacement(

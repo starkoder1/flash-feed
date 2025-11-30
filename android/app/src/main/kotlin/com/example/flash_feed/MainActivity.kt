@@ -1,4 +1,4 @@
-package com.example.flash_feed
+package com.redfstudios.flash_feed
 
 import io.flutter.embedding.android.FlutterActivity
 
