@@ -31,6 +31,7 @@ class BookmarkScreen extends ConsumerWidget {
       // 2. Show the custom snackbar which will auto-dismiss
       showCustomSnackBar(
         context: ctx,
+        backgroundColor: primaryShade,
         message: "Bookmark Removed",
         duration: const Duration(seconds: 3),
         trailing: TextButton(
@@ -128,9 +129,7 @@ class BookmarkCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
     // Fallback colors if your util variables aren't found
-    final tagBgColor = isDarkMode
-        ? const Color(0xFF424242)
-        : const Color(0xFFEEEEEE);
+    final tagBgColor = isDarkMode ? darkmodeShade : secondaryShade;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 4),

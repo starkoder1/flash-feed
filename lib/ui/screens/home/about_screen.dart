@@ -68,7 +68,7 @@ class AboutScreen extends StatelessWidget {
             ),
           ),
           Text(
-            "v1.0.0 (Build 101)",
+            appVersion,
             style: GoogleFonts.manrope(
               fontSize: 14,
               color: Colors.grey,

@@ -23,13 +23,9 @@ class SettingsPage extends ConsumerWidget {
   // --- Logic: Rate App ---
   Future<void> _rateApp() async {
     final InAppReview inAppReview = InAppReview.instance;
-    if (await inAppReview.isAvailable()) {
-      // Shows the native bottom sheet for 5-star rating
-      inAppReview.requestReview();
-    } else {
-      // Fallback: Opens the Google Play Store page
-      inAppReview.openStoreListing(appStoreId: 'com.redfstudios.flashfeed');
-    }
+    await inAppReview.openStoreListing(
+      appStoreId: 'com.redfstudios.flash_feed',
+    );  
   }
 
   @override
@@ -59,6 +55,7 @@ class SettingsPage extends ConsumerWidget {
       ),
       // CustomScrollView allows mixing list items with the sticky footer
       body: CustomScrollView(
+        scrollDirection: Axis.vertical,
         slivers: [
           // 1. Main List Content
           SliverToBoxAdapter(
@@ -208,7 +205,7 @@ class SettingsPage extends ConsumerWidget {
                   // Version Number
                   Center(
                     child: Text(
-                      "v1.0.0",
+                      appVersion,
                       style: GoogleFonts.manrope(
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
