@@ -25,29 +25,20 @@ class UpdateManager {
         backgroundColor: Colors.transparent,
         builder: (context) => WhatsNewSheet(
           features: const [
+            // FEATURE 1: Sticky Navbar
             WhatsNewFeature(
-              icon: Icons.view_stream_rounded,
-              title: "Smoother Home Feed",
+              icon: Icons.lock,
+              title: "lock Navigation Bar",
               description:
-                  "Fixed the scrolling glitch on the Home screen for a fluid experience.",
+                  "Want the menu to stay put while you read? You can now disable auto-hide in Settings.",
             ),
+
+            // FEATURE 2: Tablet/Landscape UI
             WhatsNewFeature(
-              icon: Icons.tune_rounded,
-              title: "Settings Access",
+              icon: Icons.tablet_mac_outlined,
+              title: "Optimized for Large Screens",
               description:
-                  "The Settings menu is now fully scrollable. No more hidden options on small screens.",
-            ),
-            WhatsNewFeature(
-              icon: Icons.dark_mode_rounded,
-              title: "Clearer Alerts",
-              description:
-                  "Pop-up messages (SnackBars) are now fully readable when using Dark Mode.",
-            ),
-            WhatsNewFeature(
-              icon: Icons.palette_outlined,
-              title: "Visual Polish",
-              description:
-                  "Fixed Bookmark tag colors and restored the responsiveness of the 'Rate Us' button.",
+                  "Flash Feed now looks better than ever on tablets and in landscape mode with a responsive layout.",
             ),
           ],
           onDismiss: () {

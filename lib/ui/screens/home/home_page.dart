@@ -18,10 +18,10 @@ import 'package:flash_feed/data/features/update_manager.dart';
 import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
-import 'package:flash_feed/ui/widgets/chips_delgate.dart';
 import 'package:flash_feed/ui/widgets/skeleton_loading_card.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flash_feed/ui/widgets/news_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -30,16 +30,16 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:recase/recase.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  final ScrollController? scrollController;
+  final ValueNotifier<ScrollDirection>? scrollDirectionNotifier;
 
-  const HomePage({super.key, this.scrollController});
+  const HomePage({super.key, this.scrollDirectionNotifier});
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomePage>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final PageController _pageController = PageController();
   late final ScrollController _chipsScrollController;
   bool _isChipsAtStart = true;
@@ -47,6 +47,18 @@ class _HomePageState extends ConsumerState<HomePage>
   late final List<NewsCategory> _categories;
   late final List<GlobalKey> _categoryKeys;
   int _selectedIndex = 0;
+
+  // Header animation state
+  bool _isChipsVisible = true;
+  double _lastScrollOffset = 0;
+  bool _isPageSwiping = false;
+
+  // Store scroll controllers for each category to preserve positions
+  final Map<NewsCategory, ScrollController> _categoryScrollControllers = {};
+
+  static const double _appBarHeight = 56.0;
+  static const double _chipsHeight = 60.0;
+  static const double _totalHeaderHeight = _appBarHeight + _chipsHeight;
 
   @override
   bool get wantKeepAlive => true;
@@ -73,11 +85,16 @@ class _HomePageState extends ConsumerState<HomePage>
 
     _categoryKeys = List.generate(_categories.length, (_) => GlobalKey());
 
+    // Initialize scroll controllers for each category
+    for (final category in _categories) {
+      _categoryScrollControllers[category] = ScrollController();
+    }
+
     _chipsScrollController = ScrollController();
     _chipsScrollController.addListener(_updateChipsScrollState);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    UpdateManager.checkAndShowWhatsNew(context);
-  });
+      UpdateManager.checkAndShowWhatsNew(context);
+    });
   }
 
   @override
@@ -85,6 +102,10 @@ class _HomePageState extends ConsumerState<HomePage>
     _pageController.dispose();
     _chipsScrollController.removeListener(_updateChipsScrollState);
     _chipsScrollController.dispose();
+    // Dispose all category scroll controllers
+    for (final controller in _categoryScrollControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -124,15 +145,42 @@ class _HomePageState extends ConsumerState<HomePage>
     });
   }
 
+  /// Called by child scroll views when they scroll
+  void _onChildScroll(double offset, double delta) {
+    // Don't change header visibility during page swipes
+    if (_isPageSwiping) return;
+
+    // Notify external listeners about scroll direction (for bottom nav hiding)
+    if (widget.scrollDirectionNotifier != null) {
+      if (delta > 5) {
+        widget.scrollDirectionNotifier!.value = ScrollDirection.reverse;
+      } else if (delta < -5) {
+        widget.scrollDirectionNotifier!.value = ScrollDirection.forward;
+      }
+    }
+
+    // Determine scroll direction and update chips visibility
+    if (delta > 5 && _isChipsVisible) {
+      // Scrolling down - hide chips
+      setState(() => _isChipsVisible = false);
+    } else if (delta < -5 && !_isChipsVisible) {
+      // Scrolling up - show chips
+      setState(() => _isChipsVisible = true);
+    }
+
+    _lastScrollOffset = offset;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final isDarkMode = ref.watch(themeProvider);
     final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final statusBarHeight = MediaQuery.of(context).padding.top;
 
     Widget buildChipsRow() {
       return SizedBox(
-        height: 60,
+        height: _chipsHeight,
         child: Stack(
           children: [
             Positioned.fill(
@@ -239,51 +287,95 @@ class _HomePageState extends ConsumerState<HomePage>
       },
       child: Scaffold(
         backgroundColor: scaffoldBackgroundColor,
-        body: NestedScrollView(
-          controller: widget.scrollController,
-          floatHeaderSlivers: true,
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverAppBar(
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-              forceElevated: innerBoxIsScrolled,
-              pinned: true,
-              floating: true,
-              elevation: 0,
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
-                  Text(
-                    "lashFeed",
-                    style: GoogleFonts.manrope(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
+        body: Stack(
+          children: [
+            // PageView with content - positioned below header
+            Positioned.fill(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  // Detect page swipe start/end to lock header
+                  if (notification is ScrollStartNotification) {
+                    if (notification.metrics.axis == Axis.horizontal) {
+                      _isPageSwiping = true;
+                    }
+                  } else if (notification is ScrollEndNotification) {
+                    if (notification.metrics.axis == Axis.horizontal) {
+                      _isPageSwiping = false;
+                    }
+                  }
+                  return false;
+                },
+                child: PageView.builder(
+                  allowImplicitScrolling: true,
+                  itemCount: _categories.length,
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() => _selectedIndex = index);
+                    _scrollToChip(index);
+                  },
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    return NewsCategoryView(
+                      category: category,
+                      scrollController: _categoryScrollControllers[category]!,
+                      topPadding: statusBarHeight + _totalHeaderHeight,
+                      onScroll: _onChildScroll,
+                      isChipsVisible: _isChipsVisible,
+                    );
+                  },
+                ),
               ),
             ),
-            SliverPersistentHeader(
-              delegate: ChipsDelgate(child: Center(child: buildChipsRow())),
-              floating: true,
+
+            // Fixed AppBar - always visible
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: statusBarHeight + _appBarHeight,
+                padding: EdgeInsets.only(top: statusBarHeight),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).appBarTheme.backgroundColor,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(width: 16),
+                    Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
+                    Text(
+                      "lashFeed",
+                      style: GoogleFonts.manrope(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Animated Chips Header - floats in/out
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              top: _isChipsVisible
+                  ? statusBarHeight + _appBarHeight
+                  : statusBarHeight + _appBarHeight - _chipsHeight,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
+                opacity: _isChipsVisible ? 1.0 : 0.0,
+                child: Container(
+                  height: _chipsHeight,
+                  color: scaffoldBackgroundColor,
+                  child: buildChipsRow(),
+                ),
+              ),
             ),
           ],
-          body: PageView.builder(
-            itemCount: _categories.length,
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() => _selectedIndex = index);
-              _scrollToChip(index);
-            },
-            itemBuilder: (context, index) {
-              final category = _categories[index];
-              return NewsCategoryView(
-                category: category,
-                // Removed the index passing logic - not needed with strict keep alive
-              );
-            },
-          ),
         ),
       ),
     );
@@ -329,19 +421,74 @@ ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
 
 class NewsCategoryView extends ConsumerStatefulWidget {
   final NewsCategory category;
+  final ScrollController scrollController;
+  final double topPadding;
+  final void Function(double offset, double delta) onScroll;
+  final bool isChipsVisible;
 
-  // Removed myIndex and userSelectedIndex because we are now enforcing strict KeepAlive
-  const NewsCategoryView({super.key, required this.category});
+  const NewsCategoryView({
+    super.key,
+    required this.category,
+    required this.scrollController,
+    required this.topPadding,
+    required this.onScroll,
+    required this.isChipsVisible,
+  });
+
   @override
   ConsumerState<NewsCategoryView> createState() => _NewsCategoryViewState();
 }
 
 class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
     with AutomaticKeepAliveClientMixin {
-  // FIX 1: Unconditional true.
-  // Let the OS handle memory; don't prematurely kill tabs.
+  double _lastOffset = 0;
+
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_handleScroll);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_handleScroll);
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    final offset = widget.scrollController.offset;
+    final delta = offset - _lastOffset;
+    widget.onScroll(offset, delta);
+    _lastOffset = offset;
+  }
+
+  Widget _buildNewsItem(BuildContext context, NewsItem news) {
+    DefaultCacheManager()
+        .getFileFromCache(news.imageUrl)
+        .then((fileInfo) {
+          if (fileInfo == null) {
+            // debug print logic
+          }
+        })
+        .catchError((e) {
+          // error logic
+        });
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsWebViewScreen(news: news),
+          ),
+        );
+      },
+      child: NewsCard(newsItem: news),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -350,10 +497,21 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
     final provider = providerForCategory(category);
     final newsAsyncValue = ref.watch(provider);
 
+    // Calculate dynamic top padding based on chips visibility
+    final effectiveTopPadding = widget.isChipsVisible
+        ? widget.topPadding
+        : widget.topPadding - 60; // Subtract chips height when hidden
+
     return newsAsyncValue.when(
       loading: () => ListView.builder(
+        controller: widget.scrollController,
+        padding: EdgeInsets.only(
+          top: effectiveTopPadding,
+          left: 8,
+          right: 8,
+          bottom: 8,
+        ),
         itemCount: 6,
-        padding: const EdgeInsets.all(8),
         itemBuilder: (context, index) => PlaceholderNewsCard(),
       ),
       error: (err, stack) => Center(child: Text('Error: $err')),
@@ -361,40 +519,47 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
         if (newsList.isEmpty) {
           return const Center(child: Text('No news available.'));
         }
-        return RefreshIndicator(
-          onRefresh: () async => ref.invalidate(provider),
-          child: ListView.builder(
-            // FIX 2: Added PageStorageKey.
-            // This physically saves the scroll position to the category name.
-            key: PageStorageKey(category.name),
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-            itemCount: newsList.length,
-            itemBuilder: (context, index) {
-              final news = newsList[index];
-              DefaultCacheManager()
-                  .getFileFromCache(news.imageUrl)
-                  .then((fileInfo) {
-                    if (fileInfo == null) {
-                      // debug print logic
-                    }
-                  })
-                  .catchError((e) {
-                    // error logic
-                  });
 
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewsWebViewScreen(news: news),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            bool useGrid = constraints.maxWidth > 600;
+
+            return RefreshIndicator(
+              onRefresh: () async => ref.invalidate(provider),
+              edgeOffset: effectiveTopPadding,
+              child: useGrid
+                  ? GridView.builder(
+                      controller: widget.scrollController,
+                      padding: EdgeInsets.only(
+                        top: effectiveTopPadding,
+                        left: 12,
+                        right: 12,
+                        bottom: 12,
+                      ),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.85,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: newsList.length,
+                      itemBuilder: (context, index) =>
+                          _buildNewsItem(context, newsList[index]),
+                    )
+                  : ListView.builder(
+                      controller: widget.scrollController,
+                      padding: EdgeInsets.only(
+                        top: effectiveTopPadding,
+                        left: 0,
+                        right: 0,
+                        bottom: 2,
+                      ),
+                      itemCount: newsList.length,
+                      itemBuilder: (context, index) =>
+                          _buildNewsItem(context, newsList[index]),
                     ),
-                  );
-                },
-                child: NewsCard(newsItem: news),
-              );
-            },
-          ),
+            );
+          },
         );
       },
     );

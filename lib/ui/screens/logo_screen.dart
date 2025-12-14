@@ -1,5 +1,6 @@
 import 'package:flash_feed/data/features/all_category_provider.dart';
 import 'package:flash_feed/data/features/for_you_provider.dart';
+import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/onboarding_screen_controller.dart';
@@ -20,7 +21,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
   void initState() {
     _checkOnboardingStatus();
     super.initState();
-    
+
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
       ref.read(allCategoryProvider.future);
     });
@@ -32,6 +33,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
       final prefs = await SharedPreferences.getInstance();
       ref.read(themeProvider.notifier).loadThemeFromPreferences();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
+      await ref.read(stickyNavProvider.notifier).loadStickyState();
       if (isShown) {
         Navigator.pushReplacement(
           context,
