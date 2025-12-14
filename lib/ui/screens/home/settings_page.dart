@@ -1,3 +1,4 @@
+import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/ui/screens/home/about_screen.dart';
 import 'package:flash_feed/ui/screens/home/customize_category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
@@ -25,13 +26,14 @@ class SettingsPage extends ConsumerWidget {
     final InAppReview inAppReview = InAppReview.instance;
     await inAppReview.openStoreListing(
       appStoreId: 'com.redfstudios.flash_feed',
-    );  
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
     final theme = Theme.of(context);
+    final isSticky = ref.watch(stickyNavProvider);
 
     // Reusable text style for section headers
     TextStyle sectionHeaderStyle = GoogleFonts.manrope(
@@ -71,6 +73,28 @@ class SettingsPage extends ConsumerWidget {
                       vertical: 10,
                     ),
                     child: Text("PREFERENCES", style: sectionHeaderStyle),
+                  ),
+
+                  SwitchListTile(
+                    activeThumbColor: primaryShade,
+                    activeTrackColor: secondaryShade,
+                    inactiveThumbColor: primaryShade,
+                    inactiveTrackColor: secondaryShade,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    title: Text(
+                      "Sticky Navigation Bar",
+                      style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      "Always keep the bottom menu visible while scrolling",
+                    ),
+                    secondary: Icon(
+                      isSticky ? Icons.lock : Icons.lock_open_outlined,
+                    ),
+                    value: isSticky,
+                    onChanged: (newValue) {
+                      ref.read(stickyNavProvider.notifier).setSticky(newValue);
+                    },
                   ),
 
                   SwitchListTile(

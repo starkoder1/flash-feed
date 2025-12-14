@@ -1,5 +1,6 @@
 import 'package:flash_feed/data/features/all_category_provider.dart';
 import 'package:flash_feed/data/features/for_you_provider.dart';
+import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/onboarding/onboarding_screen_controller.dart';
@@ -31,6 +32,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
     Future.delayed(const Duration(seconds: 6), () async {
       final prefs = await SharedPreferences.getInstance();
       ref.read(themeProvider.notifier).loadThemeFromPreferences();
+      await ref.read(stickyNavProvider.notifier).loadStickyState();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
       if (isShown) {
         Navigator.pushReplacement(

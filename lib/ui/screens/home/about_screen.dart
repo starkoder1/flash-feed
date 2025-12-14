@@ -18,6 +18,7 @@ class AboutScreen extends StatelessWidget {
       debugPrint("Could not launch $url");
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +69,7 @@ class AboutScreen extends StatelessWidget {
             ),
           ),
           Text(
-            appVersion,
+            "${appVersion} ",
             style: GoogleFonts.manrope(
               fontSize: 14,
               color: Colors.grey,

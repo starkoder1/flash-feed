@@ -1,13 +1,18 @@
+import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/bookmark_screen.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flash_feed/ui/widgets/hiding_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-// import 'package:flash_feed/screens/feed_page.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flash_feed/ui/screens/home/settings_page.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+
+// Provider for the Sticky Navigation setting
+// False = Hides on scroll (Default)
+// True = Always visible (Sticky)
+
 
 class HomePageController extends ConsumerStatefulWidget {
   const HomePageController({super.key});
@@ -18,17 +23,19 @@ class HomePageController extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<HomePageController> {
   int _selectedIndex = 0;
-  late PageController _pageController; // Add this for controlling page animations
-  late ScrollController _scrollController;
+  late PageController _pageController;
   late final List<Widget> pages;
+  
+  // Notifier for scroll direction - used to communicate between HomePage and HidingBottomNavBar
+  final ValueNotifier<ScrollDirection> _scrollDirectionNotifier = 
+      ValueNotifier(ScrollDirection.idle);
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(); // Initialize the controller
-    _scrollController = ScrollController();
+    _pageController = PageController();
     pages = [
-      HomePage(scrollController: _scrollController),
+      HomePage(scrollDirectionNotifier: _scrollDirectionNotifier),
       const BookmarkScreen(),
       const SettingsPage(),
     ];
@@ -36,8 +43,8 @@ class _MainScreenState extends ConsumerState<HomePageController> {
 
   @override
   void dispose() {
-    _pageController.dispose(); // Dispose to avoid memory leaks
-    _scrollController.dispose();
+    _pageController.dispose();
+    _scrollDirectionNotifier.dispose();
     super.dispose();
   }
 
@@ -51,9 +58,35 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
-    // Define pages here to pass the scroll controller
+    final isSticky = ref.watch(stickyNavProvider);
 
-    // ✅ FIXED: Wrapped in PopScope to handle Bottom Bar back navigation
+    // Extract the BottomNavigationBar to a local variable for reuse
+    final bottomNav = BottomNavigationBar(
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
+      unselectedItemColor: Colors.grey,
+      showUnselectedLabels: true,
+      type: BottomNavigationBarType.fixed,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.article_outlined),
+          activeIcon: Icon(Icons.article),
+          label: 'Feed',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bookmark_outline),
+          activeIcon: Icon(Icons.bookmark),
+          label: 'Bookmarks',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings_outlined),
+          activeIcon: Icon(Icons.settings),
+          label: 'Settings',
+        ),
+      ],
+    );
+
     return PopScope(
       canPop: _selectedIndex == 0,
       onPopInvokedWithResult: (bool didPop, Object? result) {
@@ -64,48 +97,28 @@ class _MainScreenState extends ConsumerState<HomePageController> {
         extendBody: true,
         backgroundColor: const Color(0xFF101C4D),
         body: PageView(
-          // Replace the simple body with PageView for animated transitions
           controller: _pageController,
-          reverse: false, 
-          // ✅ FIXED: Disable swipe here so it doesn't conflict with News Categories swipe
+          reverse: false,
+          // Disable swipe here so it doesn't conflict with News Categories swipe
           physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (index) {
             setState(() {
-              _selectedIndex = index; // Sync the nav bar with page changes
+              _selectedIndex = index;
             });
           },
           children: pages,
         ),
-        bottomNavigationBar: HidingBottomNavBar(
-          controller: _scrollController,
-          duration: const Duration(milliseconds: 200),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-
-            selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
-            unselectedItemColor: Colors.grey,
-            showUnselectedLabels: true,
-            type: BottomNavigationBarType.fixed,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.article_outlined),
-                activeIcon: Icon(Icons.article),
-                label: 'Feed',
+        // Conditionally Wrap:
+        // If Sticky is ON (isSticky == true), we display the bottomNav directly.
+        // If Sticky is OFF (isSticky == false), we wrap it in HidingBottomNavBar.
+        bottomNavigationBar: isSticky
+            ? bottomNav
+            : HidingBottomNavBar(
+                scrollDirectionNotifier: _scrollDirectionNotifier,
+                enableHiding: true, // Only instantiated when hiding is wanted
+                duration: const Duration(milliseconds: 200),
+                child: bottomNav,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.bookmark_outline),
-                activeIcon: Icon(Icons.bookmark),
-                label: 'Bookmarks',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                activeIcon: Icon(Icons.settings),
-                label: 'Settings',
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
