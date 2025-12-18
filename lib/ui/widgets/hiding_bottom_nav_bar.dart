@@ -15,6 +15,8 @@ class HidingBottomNavBar extends StatefulWidget {
   /// Use ScrollDirection.reverse to hide, ScrollDirection.forward to show.
   final ValueNotifier<ScrollDirection>? scrollDirectionNotifier;
 
+ 
+
   const HidingBottomNavBar({
     super.key,
     required this.child,
@@ -30,7 +32,6 @@ class HidingBottomNavBar extends StatefulWidget {
 
 class _HidingBottomNavBarState extends State<HidingBottomNavBar>
     with SingleTickerProviderStateMixin {
-
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
 
@@ -57,19 +58,16 @@ class _HidingBottomNavBarState extends State<HidingBottomNavBar>
   @override
   void didUpdateWidget(HidingBottomNavBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-
     // Handle controller changes
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?.removeListener(_scrollListener);
       widget.controller?.addListener(_scrollListener);
     }
-
     // Handle notifier changes
     if (oldWidget.scrollDirectionNotifier != widget.scrollDirectionNotifier) {
       oldWidget.scrollDirectionNotifier?.removeListener(_notifierListener);
       widget.scrollDirectionNotifier?.addListener(_notifierListener);
     }
-
     // EDGE CASE HANDLE:
     // If we switched from "Hiding Enabled" to "Hiding Disabled" (Sticky Mode),
     // we must force the bar to show immediately if it was hidden.

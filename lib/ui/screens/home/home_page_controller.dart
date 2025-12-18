@@ -26,9 +26,10 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   late final List<Widget> pages;
 
   // Notifier for scroll direction - used to communicate between HomePage and HidingBottomNavBar
-  final ValueNotifier<ScrollDirection> _scrollDirectionNotifier = ValueNotifier(
-    ScrollDirection.idle,
-  );
+  final ValueNotifier<ScrollDirection> _scrollDirectionNotifier =
+      ValueNotifier(ScrollDirection.idle);
+
+
 
   @override
   void initState() {
