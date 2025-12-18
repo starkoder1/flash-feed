@@ -90,6 +90,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     secondary: Icon(
                       isSticky ? Icons.lock : Icons.lock_open_outlined,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     value: isSticky,
                     onChanged: (newValue) {
@@ -119,12 +120,19 @@ class SettingsPage extends ConsumerWidget {
 
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                    leading: const Icon(Icons.tune),
+                    leading: Icon(
+                      Icons.tune,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     title: Text(
                       "Customize Feed",
                       style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
                     ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -148,12 +156,19 @@ class SettingsPage extends ConsumerWidget {
 
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                    leading: const Icon(Icons.info_outline),
+                    leading: Icon(
+                      Icons.info_outline,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     title: Text(
                       "About App",
                       style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
                     ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -165,7 +180,10 @@ class SettingsPage extends ConsumerWidget {
 
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                    leading: const Icon(Icons.star_outline),
+                    leading: Icon(
+                      Icons.star_outline,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     title: Text(
                       "Rate Us",
                       style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
@@ -177,7 +195,11 @@ class SettingsPage extends ConsumerWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                     onTap: _rateApp,
                   ),
 

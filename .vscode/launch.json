@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "flash_feed (Chrome - Unsecure)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--web-browser-flag",
+                "--disable-web-security"
+            ]
+        },
+        {
+            "name": "flash_feed (Mobile)",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

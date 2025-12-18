@@ -188,6 +188,16 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
     final selectedCategories = ref.watch(selectedCategoriesProvider);
     final bool showBtn = selectedCategories.length >= 3;
 
+    final width = MediaQuery.sizeOf(context).width;
+    double childAspectRatio;
+    if (width >= 600) {
+      childAspectRatio = 2.0;
+    } else if (width > 400) {
+      childAspectRatio = 1.5;
+    } else {
+      childAspectRatio = 1.1;
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -219,13 +229,12 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: 1.5,
-                        ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: childAspectRatio,
+                    ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final category = _categories[index];
                       final isSelected = selectedCategories.contains(
@@ -314,8 +323,7 @@ class _InterestCard extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            height: 160,
-            width: double.infinity,
+            constraints: const BoxConstraints.expand(),
             decoration: BoxDecoration(
               gradient: isSelected ? selectedGradient : null,
               color: isSelected ? null : Colors.white,
@@ -379,7 +387,7 @@ class _InterestCard extends StatelessWidget {
                   baseColor: Colors.transparent,
                   highlightColor: Colors.white.withOpacity(0.9),
                   period: const Duration(milliseconds: 2000),
-                  child: Container(color: Colors.white.withOpacity(0.12)),
+                  child: Container(color: Colors.white.withOpacity(0.12),),
                 ),
               ),
             ),

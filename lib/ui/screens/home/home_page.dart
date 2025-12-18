@@ -28,6 +28,9 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:recase/recase.dart';
+import 'package:flash_feed/data/features/test_news_provider.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
 
 class HomePage extends ConsumerStatefulWidget {
   final ValueNotifier<ScrollDirection>? scrollDirectionNotifier;
@@ -342,7 +345,11 @@ class _HomePageState extends ConsumerState<HomePage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(width: 16),
-                    Image.asset("assets/app_bar_logo.png", height: 40, width: 40),
+                    Image.asset(
+                      "assets/app_bar_logo.png",
+                      height: 40,
+                      width: 40,
+                    ),
                     Text(
                       "lashFeed",
                       style: GoogleFonts.manrope(
@@ -385,6 +392,7 @@ class _HomePageState extends ConsumerState<HomePage>
 ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
   NewsCategory category,
 ) {
+  
   switch (category) {
     case NewsCategory.forYou:
       return forYouProivder;
@@ -528,7 +536,7 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
               onRefresh: () async => ref.invalidate(provider),
               edgeOffset: effectiveTopPadding,
               child: useGrid
-                  ? GridView.builder(
+                  ? MasonryGridView.count(
                       controller: widget.scrollController,
                       padding: EdgeInsets.only(
                         top: effectiveTopPadding,
@@ -536,12 +544,9 @@ class _NewsCategoryViewState extends ConsumerState<NewsCategoryView>
                         right: 12,
                         bottom: 12,
                       ),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.85,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                       itemCount: newsList.length,
                       itemBuilder: (context, index) =>
                           _buildNewsItem(context, newsList[index]),

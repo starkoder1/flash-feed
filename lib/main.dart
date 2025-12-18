@@ -1,5 +1,8 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
+import 'package:flash_feed/ui/screens/home/home_page.dart';
+import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
+import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +17,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, 
+      statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
     ),
@@ -52,7 +55,8 @@ class MyApp extends ConsumerWidget {
           backgroundColor: primaryShade,
           foregroundColor: Colors.white,
           systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.dark, // Icons dark on light app background
+            statusBarIconBrightness:
+                Brightness.dark, // Icons dark on light app background
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarIconBrightness: Brightness.dark,
           ),
@@ -83,7 +87,8 @@ class MyApp extends ConsumerWidget {
           backgroundColor: Color(0xFF101C4D),
           foregroundColor: Colors.white,
           systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light, // Icons light on dark app background
+            statusBarIconBrightness:
+                Brightness.light, // Icons light on dark app background
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarIconBrightness: Brightness.light,
           ),
