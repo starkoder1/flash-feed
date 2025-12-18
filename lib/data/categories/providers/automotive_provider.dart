@@ -17,10 +17,10 @@ final automotiveListProvider = FutureProvider<List<NewsItem>>((ref) async {
       (error, stackTrace) =>
           onError('Ars Technica Automotive News Source Failed', error),
     ),
-    AutomotiveCnetSource().fetchNews().catchError(
-      (error, stackTrace) =>
-          onError('CNET Automotive News Source Failed', error),
-    ),
+    // AutomotiveCnetSource().fetchNews().catchError(
+    //   (error, stackTrace) =>
+    //       onError('CNET Automotive News Source Failed', error),
+    // ),
   ]);
   final combinedAutomotiveList = allAutoMotiveList.expand((element) {
     return element;

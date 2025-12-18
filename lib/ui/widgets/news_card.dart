@@ -110,7 +110,7 @@ class NewsCard extends ConsumerWidget {
                 Text(
                   newsItem.description,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[700],
+                    color: Colors.grey[500],
                     fontWeight: FontWeight.w100,
                     fontSize: 14,
                   ),

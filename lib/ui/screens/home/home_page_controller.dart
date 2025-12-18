@@ -61,30 +61,33 @@ class _MainScreenState extends ConsumerState<HomePageController> {
     final isSticky = ref.watch(stickyNavProvider);
 
     // Extract the BottomNavigationBar to a local variable for reuse
-    final bottomNav = BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
-      unselectedItemColor: Colors.grey,
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.article_outlined),
-          activeIcon: Icon(Icons.article),
-          label: 'Feed',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bookmark_outline),
-          activeIcon: Icon(Icons.bookmark),
-          label: 'Bookmarks',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings_outlined),
-          activeIcon: Icon(Icons.settings),
-          label: 'Settings',
-        ),
-      ],
+    final bottomNav = Theme(data: Theme.of(context).copyWith(splashColor: Colors.transparent,
+        highlightColor: Colors.transparent),
+      child: BottomNavigationBar(enableFeedback: true,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: isDarkMode ? secondaryShade : primaryShade,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article_outlined),
+            activeIcon: Icon(Icons.article),
+            label: 'Feed',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_outline),
+            activeIcon: Icon(Icons.bookmark),
+            label: 'Bookmarks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
 
     return PopScope(

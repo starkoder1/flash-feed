@@ -39,8 +39,15 @@ class JplNewsService {
       }
 
       // 2. Parse the XML string
-      final body = getBody(response).trim();
+      String body = getBody(response).trim();
       if (body.isEmpty) throw Exception('Empty RSS response from $_feedUrl');
+
+      // SANITIZATION: Fix known malformed tags in JPL feed.
+      // 1. Opening tag: `<content:encoded<![CDATA[` -> `<content:encoded><![CDATA[`
+      // 2. Closing tag: `]]>/>` -> `]]></content:encoded>`
+      body = body
+          .replaceAll('<content:encoded<![CDATA[', '<content:encoded><![CDATA[')
+          .replaceAll(']]>/>', ']]></content:encoded>');
 
       final document = xml.XmlDocument.parse(body);
 

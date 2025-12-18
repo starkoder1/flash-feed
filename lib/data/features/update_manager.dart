@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flash_feed/ui/widgets/whats_new_sheet.dart'; // Import your widget
+import 'package:flash_feed/ui/widgets/whats_new_sheet.dart';
 
 class UpdateManager {
   static const String _lastShownVersionKey = 'last_shown_version';
@@ -11,34 +11,67 @@ class UpdateManager {
     final prefs = await SharedPreferences.getInstance();
     final packageInfo = await PackageInfo.fromPlatform();
 
-    final String currentVersion = packageInfo.version; // e.g., "1.0.1"
+    final String currentVersion = packageInfo.version; // e.g., "1.1.0"
     final String? lastShownVersion = prefs.getString(_lastShownVersionKey);
 
-    // LOGIC: Show if saved version is different from current version
+    // Show only when app version changes
     if (lastShownVersion != currentVersion) {
-      // Safety check: Ensure context is still valid before showing UI
       if (!context.mounted) return;
 
       await showModalBottomSheet(
         context: context,
-        isScrollControlled: true, // Allows sheet to be taller
+        isScrollControlled: true,
         backgroundColor: Colors.transparent,
         builder: (context) => WhatsNewSheet(
           features: const [
-            // FEATURE 1: Sticky Navbar
             WhatsNewFeature(
-              icon: Icons.lock,
-              title: "Lock Navigation Bar",
+              icon: Icons.auto_awesome,
+              title: "Smart News Feed",
               description:
-                  "Want the menu to stay put while you read? You can now disable auto-hide in Settings.",
+                  "Trending and breaking news in a clean, fast layout.",
             ),
 
-            // FEATURE 2: Tablet/Landscape UI
+            WhatsNewFeature(
+              icon: Icons.category_outlined,
+              title: "News Categories",
+              description:
+                  "Technology, Business, Sports, Entertainment & more.",
+            ),
+
+            WhatsNewFeature(
+              icon: Icons.bookmark_outline,
+              title: "Bookmarks",
+              description: "Save articles and read them anytime.",
+            ),
+
+            WhatsNewFeature(
+              icon: Icons.lock_outline,
+              title: "Lock Navigation Bar",
+              description: "Keep navigation visible while reading.",
+            ),
+
+            WhatsNewFeature(
+              icon: Icons.speed,
+              title: "Smooth Performance",
+              description: "Faster loading and smooth scrolling.",
+            ),
+
+            WhatsNewFeature(
+              icon: Icons.dark_mode_outlined,
+              title: "Dark Mode",
+              description: "Comfortable reading in low light.",
+            ),
+
             WhatsNewFeature(
               icon: Icons.tablet_mac_outlined,
-              title: "Optimized for Large Screens",
-              description:
-                  "Flash Feed now looks better than ever on tablets and in landscape mode with a responsive layout.",
+              title: "Large Screen Support",
+              description: "Optimized for tablets and landscape mode.",
+            ),
+
+            WhatsNewFeature(
+              icon: Icons.share_outlined,
+              title: "Quick Sharing",
+              description: "Share news instantly with friends.",
             ),
           ],
           onDismiss: () {
@@ -47,7 +80,7 @@ class UpdateManager {
         ),
       );
 
-      // Save the current version so it doesn't show again until next update
+      // Save current version so it doesn't show again
       await prefs.setString(_lastShownVersionKey, currentVersion);
     }
   }
