@@ -4,6 +4,7 @@ import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -275,11 +276,14 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => HomePageController()),
-                      (_) => false,
-                    ),
+                    onPressed: () {
+                      HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => HomePageController()),
+                        (_) => false,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -310,7 +314,10 @@ class _InterestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.mediumImpact(); // Add haptic feedback on card tap
+        onTap();
+      },
       child: Stack(
         children: [
           Container(
@@ -318,6 +325,7 @@ class _InterestCard extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: isSelected ? selectedGradient : null,
+
               color: isSelected ? null : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(

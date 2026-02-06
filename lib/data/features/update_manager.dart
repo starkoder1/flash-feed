@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flash_feed/ui/widgets/whats_new_sheet.dart'; // Import your widget
@@ -43,6 +44,7 @@ class UpdateManager {
           ],
           onDismiss: () {
             Navigator.pop(context);
+            HapticFeedback.mediumImpact(); // Add haptic feedback on dismiss
           },
         ),
       );

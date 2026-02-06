@@ -2,6 +2,7 @@ import 'package:flash_feed/ui/screens/home/licenses_screen.dart'; // Your licens
 import 'package:flash_feed/ui/screens/home/mini_webivew_screen.dart';
 import 'package:flash_feed/utils/util.dart'; // For your colors
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -84,6 +85,7 @@ class AboutScreen extends StatelessWidget {
             title: "Privacy & Terms",
             icon: Icons.shield_outlined,
             onTap: () {
+              HapticFeedback.mediumImpact();
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -98,10 +100,13 @@ class AboutScreen extends StatelessWidget {
           _SimpleTile(
             title: "Open Source Licenses",
             icon: Icons.code,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const LicensesScreen()),
-            ),
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LicensesScreen()),
+              );
+            },
           ),
 
           const SizedBox(height: 20),
@@ -111,12 +116,15 @@ class AboutScreen extends StatelessWidget {
           _SimpleTile(
             title: "About Red-F Studios",
             icon: FontAwesomeIcons.building,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CompanyInfoScreen(),
-              ),
-            ),
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CompanyInfoScreen(),
+                ),
+              );
+            },
           ),
 
           const Spacer(),

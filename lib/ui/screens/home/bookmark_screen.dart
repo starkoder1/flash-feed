@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -37,6 +38,7 @@ class BookmarkScreen extends ConsumerWidget {
         trailing: TextButton(
           style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
           onPressed: () {
+            HapticFeedback.lightImpact(); // Add haptic feedback on undo
             notifier.addBookmark(item);
             ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
           },
@@ -90,6 +92,7 @@ class BookmarkScreen extends ConsumerWidget {
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             onDismissed: (_) {
+              HapticFeedback.lightImpact(); // Add haptic feedback on dismiss
               // Call the safe helper function
               handleDelete(context, item);
             },
@@ -105,7 +108,10 @@ class BookmarkScreen extends ConsumerWidget {
               child: BookmarkCard(
                 newsItem: item,
                 // Pass the delete logic down to the button
-                onDeletePressed: () => handleDelete(context, item),
+                onDeletePressed: () {
+                  HapticFeedback.lightImpact(); // Add haptic feedback on delete button press
+                  handleDelete(context, item);
+                },
               ),
             ),
           );
