@@ -28,6 +28,7 @@ class _OnboardingScreenControllerState
                 children: [
                   OnboardingScreen(
                     controller: _controller,
+                    
                     title: "Explore latest news",
                     description:
                         "Stay updated with real-time headlines and trending stories from trusted sources across the globe — all in one place",

@@ -23,6 +23,7 @@ import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flash_feed/ui/widgets/news_card.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -200,7 +201,10 @@ class _HomePageState extends ConsumerState<HomePage>
                       key: _categoryKeys[index],
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: GestureDetector(
-                        onTap: () => _onChipSelected(index),
+                        onTap: () {
+                          _onChipSelected(index);
+                          HapticFeedback.lightImpact();// Add haptic feedback on chip tap
+                        },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           padding: const EdgeInsets.symmetric(

@@ -4,6 +4,7 @@ import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -39,7 +40,10 @@ Future<bool> _showWarningDialogue(BuildContext context) async {
         content: const Text('Please select at least 3 categories to continue.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              Navigator.of(context).pop(false);
+            },
             child: const Text('OK'),
           ),
         ],
@@ -227,7 +231,10 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
                       return _InterestCard(
                         data: category,
                         isSelected: isSelected,
-                        onTap: () => _toggleCategory(category.categoryEnum),
+                        onTap: () {
+                          _toggleCategory(category.categoryEnum);
+                          HapticFeedback.mediumImpact();
+                        },
                         selectedGradient: gradient,
                         isDarkMode: isDarkMode,
                       );

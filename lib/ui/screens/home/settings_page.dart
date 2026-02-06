@@ -3,6 +3,7 @@ import 'package:flash_feed/ui/screens/home/about_screen.dart';
 import 'package:flash_feed/ui/screens/home/customize_category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
@@ -114,6 +115,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     value: isDarkMode,
                     onChanged: (newValue) {
+                      HapticFeedback.mediumImpact();
                       ref.read(themeProvider.notifier).toggleTheme();
                     },
                   ),
@@ -134,6 +136,7 @@ class SettingsPage extends ConsumerWidget {
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     onTap: () {
+                      HapticFeedback.mediumImpact();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -170,6 +173,7 @@ class SettingsPage extends ConsumerWidget {
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     onTap: () {
+                      HapticFeedback.mediumImpact();
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const AboutScreen(),
@@ -195,12 +199,11 @@ class SettingsPage extends ConsumerWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                    onTap: _rateApp,
+                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      _rateApp();
+                    },
                   ),
 
                   const Divider(height: 40, thickness: 1),
@@ -225,22 +228,30 @@ class SettingsPage extends ConsumerWidget {
                         _SocialButton(
                           icon: FontAwesomeIcons.xTwitter,
                           color: isDarkMode ? Colors.white : Colors.black,
-                          onTap: () =>
-                              _launchSocial('https://x.com/redfstudio'),
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            _launchSocial('https://x.com/redfstudio');
+                          },
                         ),
                         _SocialButton(
                           icon: FontAwesomeIcons.instagram,
                           color: Colors.pinkAccent,
-                          onTap: () => _launchSocial(
-                            'https://www.instagram.com/redf.studio/',
-                          ),
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            _launchSocial(
+                              'https://www.instagram.com/redf.studio/',
+                            );
+                          },
                         ),
                         _SocialButton(
                           icon: FontAwesomeIcons.linkedinIn,
                           color: const Color(0xFF0077B5), // LinkedIn Blue
-                          onTap: () => _launchSocial(
-                            'https://www.linkedin.com/in/redf-studios-847b39397/',
-                          ),
+                          onTap: () {
+                            HapticFeedback.mediumImpact();
+                            _launchSocial(
+                              'https://www.linkedin.com/in/redf-studios-847b39397/',
+                            );
+                          },
                         ),
                       ],
                     ),

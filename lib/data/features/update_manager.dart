@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flash_feed/ui/widgets/whats_new_sheet.dart';
@@ -24,6 +25,7 @@ class UpdateManager {
         backgroundColor: Colors.transparent,
         builder: (context) => WhatsNewSheet(
           features: const [
+            // FEATURE 1: Sticky Navbar
             WhatsNewFeature(
               icon: Icons.auto_awesome,
               title: "Smart News Feed",
@@ -76,6 +78,7 @@ class UpdateManager {
           ],
           onDismiss: () {
             Navigator.pop(context);
+            HapticFeedback.mediumImpact(); // Add haptic feedback on dismiss
           },
         ),
       );

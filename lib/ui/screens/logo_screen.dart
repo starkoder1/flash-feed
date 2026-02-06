@@ -21,7 +21,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
   void initState() {
     _checkOnboardingStatus();
     super.initState();
-    
+
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
       ref.read(allCategoryProvider.future);
     });
@@ -34,6 +34,7 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
       ref.read(themeProvider.notifier).loadThemeFromPreferences();
       await ref.read(stickyNavProvider.notifier).loadStickyState();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
+      await ref.read(stickyNavProvider.notifier).loadStickyState();
       if (isShown) {
         Navigator.pushReplacement(
           context,

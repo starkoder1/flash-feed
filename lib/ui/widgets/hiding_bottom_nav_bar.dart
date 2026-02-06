@@ -15,6 +15,11 @@ class HidingBottomNavBar extends StatefulWidget {
   /// Use ScrollDirection.reverse to hide, ScrollDirection.forward to show.
   final ValueNotifier<ScrollDirection>? scrollDirectionNotifier;
 
+
+
+
+ 
+
   const HidingBottomNavBar({
     super.key,
     required this.child,

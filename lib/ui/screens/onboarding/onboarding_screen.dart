@@ -2,6 +2,7 @@ import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({
@@ -71,6 +72,7 @@ class OnboardingScreen extends StatelessWidget {
                             btnHeight: 48,
                             btnWidth: 160,
                             onTap: () {
+                              HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
                               if (controller.hasClients) {
                                 controller.previousPage(
                                   duration: const Duration(milliseconds: 500),
@@ -88,6 +90,7 @@ class OnboardingScreen extends StatelessWidget {
                       btnHeight: 48,
                       btnWidth: isFirstScreen ? 300 : 160,
                       onTap: () {
+                        HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
                         if (isLastScreen) {
                           Navigator.pushReplacement(
                             context,

@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flash_feed/ui/screens/home/settings_page.dart';
 import 'package:flash_feed/utils/util.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Provider for the Sticky Navigation setting
 // False = Hides on scroll (Default)
 // True = Always visible (Sticky)
-
 
 class HomePageController extends ConsumerStatefulWidget {
   const HomePageController({super.key});
@@ -29,6 +29,7 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   // Notifier for scroll direction - used to communicate between HomePage and HidingBottomNavBar
   final ValueNotifier<ScrollDirection> _scrollDirectionNotifier = 
       ValueNotifier(ScrollDirection.idle);
+
 
   @override
   void initState() {
@@ -105,6 +106,7 @@ class _MainScreenState extends ConsumerState<HomePageController> {
           // Disable swipe here so it doesn't conflict with News Categories swipe
           physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (index) {
+            HapticFeedback.mediumImpact(); // Add haptic feedback on page change
             setState(() {
               _selectedIndex = index;
             });
