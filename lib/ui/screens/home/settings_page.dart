@@ -1,7 +1,9 @@
 import 'package:flash_feed/data/features/notification_provider.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/ui/screens/home/about_screen.dart';
 import 'package:flash_feed/ui/screens/home/customize_category_screen.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +39,7 @@ class SettingsPage extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final theme = Theme.of(context);
     final isSticky = ref.watch(stickyNavProvider);
+    final isHapticEnabled = ref.watch(hapticProvider);
     final notificationsEnabled = ref.watch(notificationProvider);
 
     // Reusable text style for section headers
@@ -98,6 +101,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     value: isSticky,
                     onChanged: (newValue) {
+                      HapticService.medium(isHapticEnabled);
                       ref.read(stickyNavProvider.notifier).setSticky(newValue);
                     },
                   ),
@@ -118,8 +122,30 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     value: isDarkMode,
                     onChanged: (newValue) {
-                      HapticFeedback.mediumImpact();
+                      HapticService.medium(isHapticEnabled);
                       ref.read(themeProvider.notifier).toggleTheme();
+                    },
+                  ),
+
+                  SwitchListTile(
+                    // Haptic Feedback Toggle
+                    activeThumbColor: primaryShade,
+                    activeTrackColor: secondaryShade,
+                    inactiveThumbColor: primaryShade,
+                    inactiveTrackColor: secondaryShade,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    title: Text(
+                      "Haptic Feedback",
+                      style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
+                    ),
+                    secondary: Icon(
+                      isDarkMode ? Icons.vibration : Icons.vibration_outlined,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                    value: isHapticEnabled,
+                    onChanged: (value) async {
+                      HapticService.medium(value);
+                      ref.read(hapticProvider.notifier).setEnabled(value);
                     },
                   ),
 
@@ -133,9 +159,7 @@ class SettingsPage extends ConsumerWidget {
                       "Notifications",
                       style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
                     ),
-                    subtitle: Text(
-                      "Receive daily news updates",
-                    ),
+                    subtitle: const Text("Receive daily news updates"),
                     secondary: Icon(
                       notificationsEnabled
                           ? Icons.notifications_active
@@ -144,8 +168,10 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     value: notificationsEnabled,
                     onChanged: (newValue) {
-                      HapticFeedback.mediumImpact();
-                      ref.read(notificationProvider.notifier).setNotifications(newValue);
+                      HapticService.medium(isHapticEnabled);
+                      ref
+                          .read(notificationProvider.notifier)
+                          .setNotifications(newValue);
                     },
                   ),
 
@@ -165,7 +191,7 @@ class SettingsPage extends ConsumerWidget {
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     onTap: () {
-                      HapticFeedback.mediumImpact();
+                      HapticService.medium(isHapticEnabled);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -202,7 +228,7 @@ class SettingsPage extends ConsumerWidget {
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     onTap: () {
-                      HapticFeedback.mediumImpact();
+                      HapticService.medium(isHapticEnabled);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const AboutScreen(),
@@ -230,7 +256,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.chevron_right, size: 20),
                     onTap: () {
-                      HapticFeedback.mediumImpact();
+                      HapticService.medium(isHapticEnabled);
                       _rateApp();
                     },
                   ),
@@ -285,7 +311,7 @@ class SettingsPage extends ConsumerWidget {
                           icon: FontAwesomeIcons.xTwitter,
                           color: isDarkMode ? Colors.white : Colors.black,
                           onTap: () {
-                            HapticFeedback.mediumImpact();
+                            HapticService.medium(isHapticEnabled);
                             _launchSocial('https://x.com/redfstudio');
                           },
                         ),
@@ -293,7 +319,7 @@ class SettingsPage extends ConsumerWidget {
                           icon: FontAwesomeIcons.instagram,
                           color: Colors.pinkAccent,
                           onTap: () {
-                            HapticFeedback.mediumImpact();
+                            HapticService.medium(isHapticEnabled);
                             _launchSocial(
                               'https://www.instagram.com/redf.studio/',
                             );
@@ -303,7 +329,7 @@ class SettingsPage extends ConsumerWidget {
                           icon: FontAwesomeIcons.linkedinIn,
                           color: const Color(0xFF0077B5), // LinkedIn Blue
                           onTap: () {
-                            HapticFeedback.mediumImpact();
+                            HapticService.medium(isHapticEnabled);
                             _launchSocial(
                               'https://www.linkedin.com/in/redf-studios-847b39397/',
                             );

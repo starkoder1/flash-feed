@@ -1,10 +1,11 @@
 import 'dart:math';
 import 'package:flash_feed/data/features/category_customize_provider.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -41,7 +42,6 @@ Future<bool> _showWarningDialogue(BuildContext context) async {
         actions: [
           TextButton(
             onPressed: () {
-              HapticFeedback.mediumImpact();
               Navigator.of(context).pop(false);
             },
             child: const Text('OK'),
@@ -178,6 +178,7 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
     final selectedCategories = ref.watch(selectedCategoriesProvider);
+    final isHapticEnabled = ref.watch(hapticProvider);
 
     return PopScope(
       canPop: selectedCategories.length >= 3,
@@ -232,8 +233,8 @@ class _CategoryScreenState extends ConsumerState<CustomizeCategoryScreen> {
                         data: category,
                         isSelected: isSelected,
                         onTap: () {
+                          HapticService.select(isHapticEnabled);
                           _toggleCategory(category.categoryEnum);
-                          HapticFeedback.mediumImpact();
                         },
                         selectedGradient: gradient,
                         isDarkMode: isDarkMode,

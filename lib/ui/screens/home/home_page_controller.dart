@@ -1,9 +1,11 @@
 import 'package:flash_feed/data/features/notification_navigation.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/bookmark_screen.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flash_feed/ui/widgets/hiding_bottom_nav_bar.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -117,7 +119,10 @@ class _MainScreenState extends ConsumerState<HomePageController> {
           // Disable swipe here so it doesn't conflict with News Categories swipe
           physics: const NeverScrollableScrollPhysics(),
           onPageChanged: (index) {
-            HapticFeedback.mediumImpact(); // Add haptic feedback on page change
+            final hapticOn = ref.read(hapticProvider);
+            HapticService.select(
+              hapticOn,
+            ); // Add haptic feedback on page change
             setState(() {
               _selectedIndex = index;
             });

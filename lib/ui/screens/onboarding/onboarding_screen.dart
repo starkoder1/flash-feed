@@ -1,10 +1,12 @@
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flash_feed/ui/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({
     super.key,
     required this.controller,
@@ -23,8 +25,9 @@ class OnboardingScreen extends StatelessWidget {
   final bool isLastScreen;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
+    final isHapticEnabled = ref.watch(hapticProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -72,7 +75,7 @@ class OnboardingScreen extends StatelessWidget {
                             btnHeight: 48,
                             btnWidth: 160,
                             onTap: () {
-                              HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
+                              HapticService.medium(isHapticEnabled);
                               if (controller.hasClients) {
                                 controller.previousPage(
                                   duration: const Duration(milliseconds: 500),
@@ -90,7 +93,7 @@ class OnboardingScreen extends StatelessWidget {
                       btnHeight: 48,
                       btnWidth: isFirstScreen ? 300 : 160,
                       onTap: () {
-                        HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
+                        HapticService.medium(isHapticEnabled);
                         if (isLastScreen) {
                           Navigator.pushReplacement(
                             context,

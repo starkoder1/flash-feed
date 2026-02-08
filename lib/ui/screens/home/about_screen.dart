@@ -1,8 +1,10 @@
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/ui/screens/home/licenses_screen.dart'; // Your license screen
 import 'package:flash_feed/ui/screens/home/mini_webivew_screen.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart'; // For your colors
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,7 +12,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // --- ADD THIS IMPORT FOR THE NEW SCREEN BELOW ---
 import 'company_info_screen.dart';
 
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends ConsumerWidget {
   const AboutScreen({super.key});
 
   Future<void> _launchURL(String url) async {
@@ -19,12 +21,12 @@ class AboutScreen extends StatelessWidget {
       debugPrint("Could not launch $url");
     }
   }
-  
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final isHapticEnabled = ref.watch(hapticProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +88,7 @@ class AboutScreen extends StatelessWidget {
             title: "Privacy & Terms",
             icon: Icons.shield_outlined,
             onTap: () {
-              HapticFeedback.mediumImpact();
+              HapticService.select(isHapticEnabled);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -102,7 +104,7 @@ class AboutScreen extends StatelessWidget {
             title: "Open Source Licenses",
             icon: Icons.code,
             onTap: () {
-              HapticFeedback.mediumImpact();
+              HapticService.select(isHapticEnabled);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const LicensesScreen()),
@@ -118,7 +120,7 @@ class AboutScreen extends StatelessWidget {
             title: "About Red-F Studios",
             icon: FontAwesomeIcons.building,
             onTap: () {
-              HapticFeedback.mediumImpact();
+              HapticService.select(isHapticEnabled);
               Navigator.push(
                 context,
                 MaterialPageRoute(
