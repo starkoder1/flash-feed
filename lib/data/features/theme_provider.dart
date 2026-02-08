@@ -7,6 +7,7 @@ class ThemeNotifier extends Notifier<bool> {
   @override
   bool build() {
     // _loadTheme(); // We will call this manually after the logo screen
+    
     return false; // Default to light mode initially
   }
 

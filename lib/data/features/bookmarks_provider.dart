@@ -12,9 +12,9 @@ class BookmarksNotifier extends Notifier<List<NewsItem>> {
 
   @override
   List<NewsItem> build() {
-    return _box.values.map((e) {
-      final map = Map<String, dynamic>.from(e as Map);
-      return NewsItem.fromJson(map);
+    return _box.values.map((e) {  // Convert each stored bookmark back into a NewsItem
+      final map = Map<String, dynamic>.from(e as Map);  // Ensure the stored data is treated as a Map<String, dynamic>
+      return NewsItem.fromJson(map); // Convert the map back into a NewsItem using the fromJson constructor
     }).toList();
   }
 
@@ -41,7 +41,7 @@ class BookmarksNotifier extends Notifier<List<NewsItem>> {
       debugPrint("   TITLE → ${item.title}");
       debugPrint("   LINK → ${item.link}");
       debugPrint("   TOTAL → ${_box.length}");
-      state = state.where((i) => i.link != item.link).toList();
+      state = state.where((i) => i.link != item.link).toList(); // Update the state by filtering out the removed bookmark
     } catch (e) {
       debugPrint("❌ FAILED TO DELETE BOOKMARK");
       debugPrint("   TITLE → ${item.title}");

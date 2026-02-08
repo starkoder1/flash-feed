@@ -34,7 +34,6 @@ class _LogoScreenState extends ConsumerState<LogoScreen> {
       ref.read(themeProvider.notifier).loadThemeFromPreferences();
       await ref.read(stickyNavProvider.notifier).loadStickyState();
       final isShown = prefs.getBool('onboarding_shown') ?? false;
-      await ref.read(stickyNavProvider.notifier).loadStickyState();
       if (isShown) {
         Navigator.pushReplacement(
           context,

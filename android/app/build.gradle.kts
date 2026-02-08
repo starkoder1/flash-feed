@@ -1,7 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -14,6 +13,9 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // --- ADDED FLAG HERE ---
+        isCoreLibraryDesugaringEnabled = true
+        
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -55,4 +57,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// --- ADDED DEPENDENCIES BLOCK HERE ---
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

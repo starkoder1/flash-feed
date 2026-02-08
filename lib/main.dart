@@ -1,14 +1,15 @@
+import 'package:flash_feed/data/features/notification_navigation.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
-import 'package:flash_feed/ui/screens/home/home_page.dart';
-import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
-import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
+import 'package:flash_feed/utils/notification_service.dart';
+import 'package:flash_feed/utils/notification_worker.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,16 @@ void main() async {
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 256;
   await Hive.initFlutter();
   await Hive.openBox('bookmarks');
+
+  // Initialize Workmanager for background notification tasks
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+
+  // Initialize notification service with tap handlers
+  await NotificationService.initialize();
+
+  // Schedule the first background notification task
+  scheduleNextRandomTask();
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -37,6 +48,7 @@ class MyApp extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
 
     return MaterialApp(
+      navigatorKey: notificationNavKey,
       debugShowCheckedModeBanner: false,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
 

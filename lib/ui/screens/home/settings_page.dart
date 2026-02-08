@@ -1,3 +1,4 @@
+import 'package:flash_feed/data/features/notification_provider.dart';
 import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/ui/screens/home/about_screen.dart';
 import 'package:flash_feed/ui/screens/home/customize_category_screen.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:in_app_review/in_app_review.dart';
 
@@ -35,6 +37,7 @@ class SettingsPage extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final theme = Theme.of(context);
     final isSticky = ref.watch(stickyNavProvider);
+    final notificationsEnabled = ref.watch(notificationProvider);
 
     // Reusable text style for section headers
     TextStyle sectionHeaderStyle = GoogleFonts.manrope(
@@ -117,6 +120,32 @@ class SettingsPage extends ConsumerWidget {
                     onChanged: (newValue) {
                       HapticFeedback.mediumImpact();
                       ref.read(themeProvider.notifier).toggleTheme();
+                    },
+                  ),
+
+                  SwitchListTile(
+                    activeThumbColor: primaryShade,
+                    activeTrackColor: secondaryShade,
+                    inactiveThumbColor: primaryShade,
+                    inactiveTrackColor: secondaryShade,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    title: Text(
+                      "Notifications",
+                      style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      "Receive daily news updates",
+                    ),
+                    secondary: Icon(
+                      notificationsEnabled
+                          ? Icons.notifications_active
+                          : Icons.notifications_off_outlined,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                    value: notificationsEnabled,
+                    onChanged: (newValue) {
+                      HapticFeedback.mediumImpact();
+                      ref.read(notificationProvider.notifier).setNotifications(newValue);
                     },
                   ),
 
@@ -203,6 +232,33 @@ class SettingsPage extends ConsumerWidget {
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       _rateApp();
+                    },
+                  ),
+
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                    leading: Icon(
+                      Icons.share_outlined,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                    title: Text(
+                      "Share App",
+                      style: GoogleFonts.manrope(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      "Share FlashFeed with friends",
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      Share.share(
+                        'Check out FlashFeed - News in a Flash! ⚡\nhttps://play.google.com/store/apps/details?id=com.redfstudios.flash_feed',
+                        subject: 'FlashFeed App',
+                      );
                     },
                   ),
 

@@ -1,8 +1,10 @@
+import 'package:flash_feed/data/features/notification_navigation.dart';
 import 'package:flash_feed/data/features/sticky_navigation_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/ui/screens/home/bookmark_screen.dart';
 import 'package:flash_feed/ui/screens/home/home_page.dart';
 import 'package:flash_feed/ui/widgets/hiding_bottom_nav_bar.dart';
+import 'package:flash_feed/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flash_feed/ui/screens/home/settings_page.dart';
@@ -25,11 +27,11 @@ class _MainScreenState extends ConsumerState<HomePageController> {
   int _selectedIndex = 0;
   late PageController _pageController;
   late final List<Widget> pages;
-  
-  // Notifier for scroll direction - used to communicate between HomePage and HidingBottomNavBar
-  final ValueNotifier<ScrollDirection> _scrollDirectionNotifier = 
-      ValueNotifier(ScrollDirection.idle);
 
+  // Notifier for scroll direction - used to communicate between HomePage and HidingBottomNavBar
+  final ValueNotifier<ScrollDirection> _scrollDirectionNotifier = ValueNotifier(
+    ScrollDirection.idle,
+  );
 
   @override
   void initState() {
@@ -40,6 +42,11 @@ class _MainScreenState extends ConsumerState<HomePageController> {
       const BookmarkScreen(),
       const SettingsPage(),
     ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      handlePendingNotification(); // Check for pending notifications after the first frame is rendered
+      // Request notification permission when homepage loads for the first time
+      NotificationService.requestPermission();
+    });
   }
 
   @override
@@ -62,9 +69,13 @@ class _MainScreenState extends ConsumerState<HomePageController> {
     final isSticky = ref.watch(stickyNavProvider);
 
     // Extract the BottomNavigationBar to a local variable for reuse
-    final bottomNav = Theme(data: Theme.of(context).copyWith(splashColor: Colors.transparent,
-        highlightColor: Colors.transparent),
-      child: BottomNavigationBar(enableFeedback: true,
+    final bottomNav = Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+      ),
+      child: BottomNavigationBar(
+        enableFeedback: true,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: isDarkMode ? secondaryShade : primaryShade,

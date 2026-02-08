@@ -45,11 +45,11 @@ class SelectedCategoriesNotifier extends Notifier<List<NewsCategory>> {
     }
   }
 
-  void toggleCategory(NewsCategory category) {
-    if (state.contains(category)) {
-      state = [...state]..remove(category);
+  void toggleCategory(NewsCategory category) { // Toggle the category in the state list
+    if (state.contains(category)) {  // If the category is already selected, remove it from the list
+      state = [...state]..remove(category);  // Create a new list to trigger state change and remove the category
     } else {
-      state = [...state, category];
+      state = [...state, category];  // If the category is not selected, add it to the list by creating a new list with the existing categories and the new category
     }
     _savecategories(); //save the categories as soon as user makes changes
   }
