@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flash_feed/data/features/bookmarks_provider.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/widgets/app_snackbar.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -169,6 +171,8 @@ class NewsCard extends ConsumerWidget {
                     IconButton(
                       tooltip: 'Share',
                       onPressed: () {
+                        final hapticOn = ref.read(hapticProvider);
+                        HapticService.select(hapticOn);
                         SharePlus.instance.share(
                           ShareParams(
                             uri: Uri.parse(newsItem.link),
@@ -181,6 +185,8 @@ class NewsCard extends ConsumerWidget {
 
                     IconButton(
                       onPressed: () {
+                        final hapticOn = ref.read(hapticProvider);
+                        HapticService.select(hapticOn);
                         if (isBookmarked) {
                           notifier.removeBookmark(newsItem);
                           showCustomSnackBar(
@@ -193,6 +199,8 @@ class NewsCard extends ConsumerWidget {
                                 padding: EdgeInsets.all(0),
                               ),
                               onPressed: () {
+                                final hapticOn = ref.read(hapticProvider);
+                                HapticService.select(hapticOn);
                                 notifier.addBookmark(newsItem);
                                 ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
                               },

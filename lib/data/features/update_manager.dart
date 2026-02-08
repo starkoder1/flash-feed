@@ -78,7 +78,7 @@ class UpdateManager {
           ],
           onDismiss: () {
             Navigator.pop(context);
-            HapticFeedback.mediumImpact(); // Add haptic feedback on dismiss
+            HapticFeedback.mediumImpact(); // Haptic feedback on dismiss
           },
         ),
       );

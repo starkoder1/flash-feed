@@ -1,10 +1,11 @@
 import 'dart:math';
 import 'package:flash_feed/data/features/category_customize_provider.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
@@ -187,6 +188,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedCategories = ref.watch(selectedCategoriesProvider);
+    final isHapticEnabled = ref.watch(hapticProvider);
     final bool showBtn = selectedCategories.length >= 3;
 
     final width = MediaQuery.sizeOf(context).width;
@@ -247,7 +249,10 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                       return _InterestCard(
                         data: category,
                         isSelected: isSelected,
-                        onTap: () => _toggleCategory(category.categoryEnum),
+                        onTap: () {
+                          HapticService.select(isHapticEnabled);
+                          _toggleCategory(category.categoryEnum);
+                        },
                         selectedGradient: gradient,
                       );
                     }, childCount: _categories.length),
@@ -286,7 +291,7 @@ class _CategoryScreenState extends ConsumerState<CategoryScreen> {
                       ),
                     ),
                     onPressed: () {
-                      HapticFeedback.mediumImpact(); // Add haptic feedback on button tap
+                      HapticService.select(isHapticEnabled);
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (_) => HomePageController()),
@@ -323,10 +328,7 @@ class _InterestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.mediumImpact(); // Add haptic feedback on card tap
-        onTap();
-      },
+      onTap: onTap,
       child: Stack(
         children: [
           Container(
@@ -395,7 +397,7 @@ class _InterestCard extends StatelessWidget {
                   baseColor: Colors.transparent,
                   highlightColor: Colors.white.withOpacity(0.9),
                   period: const Duration(milliseconds: 2000),
-                  child: Container(color: Colors.white.withOpacity(0.12),),
+                  child: Container(color: Colors.white.withOpacity(0.12)),
                 ),
               ),
             ),

@@ -1,8 +1,5 @@
 import 'package:flash_feed/data/features/theme_provider.dart';
-import 'package:flash_feed/ui/screens/home/home_page.dart';
-import 'package:flash_feed/ui/screens/home/home_page_controller.dart';
 import 'package:flash_feed/ui/screens/logo_screen.dart';
-import 'package:flash_feed/ui/screens/onboarding/category_screen.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +23,7 @@ void main() async {
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1024 * 1024 * 256;
   await Hive.initFlutter();
   await Hive.openBox('bookmarks');
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

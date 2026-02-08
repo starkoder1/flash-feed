@@ -13,12 +13,14 @@ import 'package:flash_feed/data/categories/providers/tech_provider.dart';
 import 'package:flash_feed/data/categories/providers/world_provider.dart';
 import 'package:flash_feed/data/features/all_category_provider.dart';
 import 'package:flash_feed/data/features/for_you_provider.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
 import 'package:flash_feed/data/features/theme_provider.dart';
 import 'package:flash_feed/data/features/update_manager.dart';
 import 'package:flash_feed/data/models/news_category.dart';
 import 'package:flash_feed/data/models/news_item.dart';
 import 'package:flash_feed/ui/screens/news_webview_screen.dart';
 import 'package:flash_feed/ui/widgets/skeleton_loading_card.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flash_feed/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -203,7 +205,8 @@ class _HomePageState extends ConsumerState<HomePage>
                       child: GestureDetector(
                         onTap: () {
                           _onChipSelected(index);
-                          HapticFeedback.lightImpact();// Add haptic feedback on chip tap
+                         final hapticOn = ref.read(hapticProvider);
+  HapticService.select(hapticOn);// Add haptic feedback on chip tap
                         },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
@@ -396,7 +399,7 @@ class _HomePageState extends ConsumerState<HomePage>
 ProviderBase<AsyncValue<List<NewsItem>>> providerForCategory(
   NewsCategory category,
 ) {
-  
+
   switch (category) {
     case NewsCategory.forYou:
       return forYouProivder;

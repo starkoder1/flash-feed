@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flash_feed/data/features/haptic_provider.dart';
+import 'package:flash_feed/utils/haptic_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,7 +40,8 @@ class BookmarkScreen extends ConsumerWidget {
         trailing: TextButton(
           style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
           onPressed: () {
-            HapticFeedback.lightImpact(); // Add haptic feedback on undo
+            final hapticOn = ref.read(hapticProvider);
+            HapticService.select(hapticOn); // Add haptic feedback on undo
             notifier.addBookmark(item);
             ScaffoldMessenger.of(ctx).hideCurrentSnackBar();
           },
@@ -92,12 +95,15 @@ class BookmarkScreen extends ConsumerWidget {
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             onDismissed: (_) {
-              HapticFeedback.lightImpact(); // Add haptic feedback on dismiss
+              final hapticOn = ref.read(hapticProvider);
+              HapticService.select(hapticOn); // Add haptic feedback on dismiss
               // Call the safe helper function
               handleDelete(context, item);
             },
             child: InkWell(
               onTap: () {
+                final hapticOn = ref.read(hapticProvider);
+                HapticService.select(hapticOn); // Add haptic feedback on tap
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -109,7 +115,10 @@ class BookmarkScreen extends ConsumerWidget {
                 newsItem: item,
                 // Pass the delete logic down to the button
                 onDeletePressed: () {
-                  HapticFeedback.lightImpact(); // Add haptic feedback on delete button press
+                  final hapticOn = ref.read(hapticProvider);
+                  HapticService.select(
+                    hapticOn,
+                  ); // Add haptic feedback on delete button press
                   handleDelete(context, item);
                 },
               ),
@@ -272,6 +281,8 @@ class BookmarkCard extends ConsumerWidget {
                     IconButton(
                       tooltip: 'Share',
                       onPressed: () {
+                        final hapticOn = ref.read(hapticProvider);
+                        HapticService.select(hapticOn);
                         SharePlus.instance.share(
                           ShareParams(
                             uri: Uri.parse(newsItem.link),
